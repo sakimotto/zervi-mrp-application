@@ -1,55 +1,63 @@
 # UI Preview Plan for Zervi MRP Application
 
-## Project Overview for Beginners
-This document explains the Zervi MRP (Material Requirements Planning) application in simple terms. Think of this application as a digital command center for Zervi Group's manufacturing operations across their four divisions: Automotive, Camping, Apparel, and Zervitek (Technical Textile).
+## Project Overview
 
-### What This Application Does
-- Tracks materials, products, and work-in-progress items
-- Manages manufacturing operations (Laminating, Cutting, Sewing, Embroidery)
-- Handles transfers between different divisions
-- Calculates costs and helps with planning production
+The Zervi MRP (Manufacturing Resource Planning) application is designed to manage manufacturing operations across multiple divisions (Automotive, Camping, Apparel, Zervitek). This document outlines the approach for creating static UI previews of the application.
 
-### Technical Parts (Simplified)
-- **Backend**: The "brain" of the system (using Node.js with Express)
-- **Frontend**: What users see and interact with (using React with Material UI)
-- **Database**: Where all information is stored (using PostgreSQL)
+## Current Status
 
-## Current Status - March 29, 2025
-- All documentation is complete and reviewed
-- The user interface has been designed but we haven't seen it running yet
-- We want to look at the design without changing any of the original code
+The project has completed the following milestones:
 
-## Our Preview Plan
-To see the user interface without risking any changes to the original work:
+- Initial project setup and documentation
+- Creation of main UI navigation and dashboard
+- Development of division-specific interfaces
+- Implementation of inventory management views
+- Development of manufacturing interfaces (including routing and BOM management)
+- Advanced BOM management tools (creation, costing, version comparison)
+- Specialized manufacturing operations for textile production
 
-1. **Create a separate preview folder**: This keeps our viewing area separate from the real project
-2. **Make static HTML versions**: Convert the interactive screens to simple viewable pages
-3. **Focus on important screens**: Start with Dashboard, then look at other key pages
+## Next Steps
 
-## Dashboard Design Features
-Based on our review of the code, the dashboard includes:
-- Summary cards showing important numbers (inventory, orders, etc.)
-- Different views for each division
-- Color-coded indicators (green for good, yellow for caution, red for problems)
-- Simple navigation buttons to move to detailed sections
+The following steps are planned for the UI preview development:
 
-## What We'll Do Next
-1. Create our preview folder structure
-2. Generate simple HTML versions of the main screens
-3. Add simple explanations for each screen
-4. Possibly create visual mockups to better see the design
+- User testing and feedback gathering
+- Refinement based on stakeholder input
+- Integration planning with backend services
+- Documentation of UI components and patterns
 
-## Important Note
-This project is being reviewed for feedback purposes only. We will not change any original code. All our preview work will happen in a separate folder to keep the original project intact.
+## UI Preview Structure
 
-## Preview Folder Structure
-We plan to organize our preview files like this:
+The UI preview is organized into the following sections:
+
+- Main navigation (index.html)
+- Dashboard (dashboard/index.html)
+- Manufacturing section
+  - Manufacturing overview (manufacturing/index.html)
+  - Bill of Materials (manufacturing/bom.html)
+  - BOM Creation/Editing (manufacturing/bom-create.html)
+  - BOM Costing Analysis (manufacturing/bom-costing.html)
+  - BOM Version Comparison (manufacturing/bom-version-compare.html)
+  - Production Routing (manufacturing/routing.html)
+  - Specialized Operations (manufacturing/specialized-operations.html)
+- Inventory (inventory/index.html)
+- Divisions (divisions/index.html)
+- Transfers (transfers/index.html)
+
+## Implementation Details
+
+The UI previews use HTML, CSS, and minimal JavaScript to demonstrate the application's interface. Material Design principles are followed for consistent styling and user experience.
+
+## GitHub Integration
+
+```javascript
+// The repository is available at:
+// https://github.com/sakimotto/zervi-mrp-application.git
 ```
-/zervi-ui-preview/
-  /dashboard/
-  /manufacturing/
-  /inventory/
-  /divisions/
-  /transfers/
-  index.html (main navigation page)
-```
+
+## Feedback Process
+
+Stakeholders can provide feedback by:
+
+1. Viewing the static HTML files directly
+2. Using the GitHub repository issues section
+3. Scheduled review meetings with the development team

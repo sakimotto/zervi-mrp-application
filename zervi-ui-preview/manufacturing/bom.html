@@ -1,0 +1,621 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Zervi MRP - Bill of Materials (BOM) Management</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap" />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons" />
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f5f5f5;
+            color: #333;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        header {
+            background-color: #1976d2;
+            color: white;
+            padding: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        h1, h2, h3, h4 {
+            margin-top: 0;
+            font-weight: 400;
+        }
+        .card {
+            background-color: white;
+            border-radius: 4px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            overflow: hidden;
+            margin-bottom: 20px;
+        }
+        .card-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 16px;
+            border-bottom: 1px solid #eee;
+        }
+        .card-title {
+            display: flex;
+            align-items: center;
+        }
+        .card-title i {
+            margin-right: 8px;
+            color: #1976d2;
+        }
+        .card-content {
+            padding: 16px;
+        }
+        .btn {
+            background-color: transparent;
+            color: #1976d2;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            text-transform: uppercase;
+        }
+        .btn:hover {
+            background-color: rgba(25, 118, 210, 0.1);
+        }
+        .btn-primary {
+            background-color: #1976d2;
+            color: white;
+        }
+        .btn-primary:hover {
+            background-color: #1565c0;
+        }
+        .breadcrumb {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        .breadcrumb a {
+            color: #1976d2;
+            text-decoration: none;
+        }
+        .breadcrumb span {
+            margin: 0 5px;
+        }
+        nav {
+            display: flex;
+            background-color: white;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .nav-item {
+            padding: 15px 20px;
+            color: #666;
+            text-decoration: none;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+        }
+        .nav-item i {
+            margin-right: 5px;
+        }
+        .nav-item.active {
+            color: #1976d2;
+            border-bottom: 2px solid #1976d2;
+        }
+        .nav-item:hover {
+            background-color: #f5f5f5;
+        }
+        footer {
+            margin-top: 40px;
+            padding: 20px;
+            text-align: center;
+            color: #666;
+            font-size: 0.9em;
+        }
+        .tab-bar {
+            display: flex;
+            background-color: white;
+            border-radius: 4px;
+            overflow: hidden;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        .tab {
+            padding: 15px 25px;
+            cursor: pointer;
+            font-weight: 500;
+        }
+        .tab.active {
+            background-color: #1976d2;
+            color: white;
+        }
+        .tab:hover:not(.active) {
+            background-color: #f5f5f5;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        thead {
+            background-color: #f5f5f5;
+        }
+        th, td {
+            text-align: left;
+            padding: 12px 15px;
+            border-bottom: 1px solid #eee;
+        }
+        tr:hover {
+            background-color: #f9f9f9;
+        }
+        .search-bar {
+            display: flex;
+            margin-bottom: 20px;
+        }
+        .search-input {
+            flex: 1;
+            padding: 10px 15px;
+            border: 1px solid #ddd;
+            border-radius: 4px 0 0 4px;
+            font-size: 16px;
+        }
+        .search-button {
+            background-color: #1976d2;
+            color: white;
+            border: none;
+            padding: 0 20px;
+            border-radius: 0 4px 4px 0;
+            cursor: pointer;
+        }
+        .filter-bar {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        .filter-chip {
+            background-color: #e3f2fd;
+            color: #1976d2;
+            padding: 5px 12px;
+            border-radius: 16px;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+        }
+        .filter-chip i {
+            font-size: 16px;
+            margin-left: 5px;
+        }
+        .tree-view {
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            overflow: hidden;
+            max-height: 500px;
+            overflow-y: auto;
+        }
+        .tree-item {
+            display: flex;
+            align-items: center;
+            padding: 10px 15px;
+            border-bottom: 1px solid #eee;
+        }
+        .tree-item:hover {
+            background-color: #f5f5f5;
+        }
+        .tree-item i {
+            margin-right: 8px;
+            color: #1976d2;
+        }
+        .tree-level-1 {
+            padding-left: 25px;
+            background-color: #f9f9f9;
+        }
+        .tree-level-2 {
+            padding-left: 50px;
+            background-color: #f5f5f5;
+        }
+        .tree-level-3 {
+            padding-left: 75px;
+            background-color: #f0f0f0;
+        }
+        .bom-visualization {
+            height: 400px;
+            background-color: #f9f9f9;
+            border-radius: 4px;
+            position: relative;
+            margin: 20px 0;
+        }
+        .bom-visualization::after {
+            content: "BOM hierarchical visualization would appear here";
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: #999;
+        }
+        .status-badge {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+        .status-active {
+            background-color: #e8f5e9;
+            color: #4caf50;
+        }
+        .status-pending {
+            background-color: #fff8e1;
+            color: #ff9800;
+        }
+        .status-obsolete {
+            background-color: #ffebee;
+            color: #f44336;
+        }
+        .grid-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+        @media (max-width: 768px) {
+            .grid-2 {
+                grid-template-columns: 1fr;
+            }
+        }
+        .info-box {
+            padding: 15px;
+            background-color: #e3f2fd;
+            border-radius: 4px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: flex-start;
+        }
+        .info-box i {
+            margin-right: 10px;
+            color: #1976d2;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <h1>Zervi MRP</h1>
+                <div style="display: flex; align-items: center; padding: 8px 16px; border-radius: 20px; background-color: rgba(255, 255, 255, 0.2);">
+                    Automotive Division <i class="material-icons" style="margin-left: 5px; font-size: 18px;">arrow_drop_down</i>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <nav>
+        <div class="container" style="display: flex;">
+            <a href="../dashboard/index.html" class="nav-item"><i class="material-icons">dashboard</i> Dashboard</a>
+            <a href="../inventory/index.html" class="nav-item"><i class="material-icons">inventory_2</i> Inventory</a>
+            <a href="index.html" class="nav-item active"><i class="material-icons">precision_manufacturing</i> Manufacturing</a>
+            <a href="#" class="nav-item"><i class="material-icons">shopping_cart</i> Sales</a>
+            <a href="#" class="nav-item"><i class="material-icons">local_shipping</i> Procurement</a>
+            <a href="../transfers/index.html" class="nav-item"><i class="material-icons">swap_horiz</i> Transfers</a>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="breadcrumb">
+            <a href="../index.html">Home</a>
+            <span>/</span>
+            <a href="index.html">Manufacturing</a>
+            <span>/</span>
+            <a href="#">Bill of Materials</a>
+        </div>
+
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+            <h2>Bill of Materials (BOM) Management</h2>
+            <button class="btn btn-primary"><i class="material-icons" style="margin-right: 5px;">add</i> Create New BOM</button>
+        </div>
+
+        <div class="info-box">
+            <i class="material-icons">info</i>
+            <div>
+                <p>The Bill of Materials (BOM) module supports multi-level product structures, enabling hierarchical relationships between raw materials, semi-finished goods, and finished products. Each BOM can be versioned with support for alternative materials and phantom BOMs.</p>
+            </div>
+        </div>
+
+        <div class="tab-bar">
+            <div class="tab active">BOMs</div>
+            <div class="tab">BOM Components</div>
+            <div class="tab">Alternative Materials</div>
+            <div class="tab">Version Control</div>
+        </div>
+
+        <div class="card">
+            <div class="card-header">
+                <div class="card-title">
+                    <i class="material-icons">account_tree</i>
+                    <h3>Bill of Materials List</h3>
+                </div>
+            </div>
+            <div class="card-content">
+                <div class="search-bar">
+                    <input type="text" class="search-input" placeholder="Search BOMs...">
+                    <button class="search-button"><i class="material-icons">search</i></button>
+                </div>
+
+                <div class="filter-bar">
+                    <div class="filter-chip">Product: All <i class="material-icons">arrow_drop_down</i></div>
+                    <div class="filter-chip">Status: All <i class="material-icons">arrow_drop_down</i></div>
+                    <div class="filter-chip">Version: All <i class="material-icons">arrow_drop_down</i></div>
+                    <div class="filter-chip">Type: All <i class="material-icons">arrow_drop_down</i></div>
+                </div>
+
+                <table>
+                    <thead>
+                        <tr>
+                            <th>BOM ID</th>
+                            <th>Product</th>
+                            <th>Version</th>
+                            <th>Type</th>
+                            <th>Components</th>
+                            <th>Status</th>
+                            <th>Last Updated</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>BOM-CAR-001</td>
+                            <td>Car Seat Cover - Model A</td>
+                            <td>1.2</td>
+                            <td>Manufacturing</td>
+                            <td>8</td>
+                            <td><span class="status-badge status-active">Active</span></td>
+                            <td>Mar 15, 2025</td>
+                            <td>
+                                <button class="btn">View</button>
+                                <button class="btn">Edit</button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>BOM-CAR-002</td>
+                            <td>Car Seat Cover - Model B</td>
+                            <td>1.0</td>
+                            <td>Manufacturing</td>
+                            <td>7</td>
+                            <td><span class="status-badge status-active">Active</span></td>
+                            <td>Mar 12, 2025</td>
+                            <td>
+                                <button class="btn">View</button>
+                                <button class="btn">Edit</button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>BOM-DCO-001</td>
+                            <td>Dashboard Cover - Premium</td>
+                            <td>2.1</td>
+                            <td>Manufacturing</td>
+                            <td>5</td>
+                            <td><span class="status-badge status-active">Active</span></td>
+                            <td>Mar 10, 2025</td>
+                            <td>
+                                <button class="btn">View</button>
+                                <button class="btn">Edit</button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>BOM-DCO-002</td>
+                            <td>Dashboard Cover - Standard</td>
+                            <td>1.5</td>
+                            <td>Manufacturing</td>
+                            <td>4</td>
+                            <td><span class="status-badge status-obsolete">Obsolete</span></td>
+                            <td>Feb 28, 2025</td>
+                            <td>
+                                <button class="btn">View</button>
+                                <button class="btn">Edit</button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>BOM-FLM-001</td>
+                            <td>Floor Mat - Standard</td>
+                            <td>1.3</td>
+                            <td>Manufacturing</td>
+                            <td>6</td>
+                            <td><span class="status-badge status-active">Active</span></td>
+                            <td>Mar 08, 2025</td>
+                            <td>
+                                <button class="btn">View</button>
+                                <button class="btn">Edit</button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>BOM-FLM-002</td>
+                            <td>Floor Mat - Deluxe</td>
+                            <td>1.0</td>
+                            <td>Manufacturing</td>
+                            <td>7</td>
+                            <td><span class="status-badge status-pending">Pending</span></td>
+                            <td>Mar 25, 2025</td>
+                            <td>
+                                <button class="btn">View</button>
+                                <button class="btn">Edit</button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>BOM-SUN-001</td>
+                            <td>Sun Visor - Deluxe</td>
+                            <td>1.1</td>
+                            <td>Manufacturing</td>
+                            <td>5</td>
+                            <td><span class="status-badge status-active">Active</span></td>
+                            <td>Mar 05, 2025</td>
+                            <td>
+                                <button class="btn">View</button>
+                                <button class="btn">Edit</button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <div style="display: flex; justify-content: flex-end; margin-top: 20px; align-items: center;">
+                    <span style="margin-right: 20px;">Showing 1-7 of 24 BOMs</span>
+                    <button class="btn" disabled>Previous</button>
+                    <button class="btn">Next</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header">
+                <div class="card-title">
+                    <i class="material-icons">visibility</i>
+                    <h3>BOM View: Car Seat Cover - Model A</h3>
+                </div>
+            </div>
+            <div class="card-content">
+                <div class="grid-2">
+                    <div>
+                        <h4>BOM Details</h4>
+                        <table style="margin-bottom: 20px;">
+                            <tr>
+                                <th style="width: 150px;">Product:</th>
+                                <td>Car Seat Cover - Model A</td>
+                            </tr>
+                            <tr>
+                                <th>BOM ID:</th>
+                                <td>BOM-CAR-001</td>
+                            </tr>
+                            <tr>
+                                <th>Version:</th>
+                                <td>1.2 (Released on Mar 15, 2025)</td>
+                            </tr>
+                            <tr>
+                                <th>Status:</th>
+                                <td><span class="status-badge status-active">Active</span></td>
+                            </tr>
+                            <tr>
+                                <th>Created By:</th>
+                                <td>John Doe</td>
+                            </tr>
+                            <tr>
+                                <th>Last Updated:</th>
+                                <td>Mar 15, 2025 by Jane Smith</td>
+                            </tr>
+                            <tr>
+                                <th>Description:</th>
+                                <td>Standard seat cover for economy car models with integrated foam padding.</td>
+                            </tr>
+                        </table>
+                        
+                        <h4>Cost Breakdown</h4>
+                        <table>
+                            <tr>
+                                <th style="width: 150px;">Material Cost:</th>
+                                <td>$18.50</td>
+                            </tr>
+                            <tr>
+                                <th>Labor Cost:</th>
+                                <td>$12.75</td>
+                            </tr>
+                            <tr>
+                                <th>Overhead:</th>
+                                <td>$5.25</td>
+                            </tr>
+                            <tr>
+                                <th>Total Cost:</th>
+                                <td><strong>$36.50</strong></td>
+                            </tr>
+                        </table>
+                    </div>
+                    
+                    <div>
+                        <h4>Version History</h4>
+                        <table style="margin-bottom: 20px;">
+                            <thead>
+                                <tr>
+                                    <th>Version</th>
+                                    <th>Date</th>
+                                    <th>Changes</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>1.2</td>
+                                    <td>Mar 15, 2025</td>
+                                    <td>Updated thread supplier and material specifications</td>
+                                </tr>
+                                <tr>
+                                    <td>1.1</td>
+                                    <td>Feb 10, 2025</td>
+                                    <td>Added waterproof coating requirement</td>
+                                </tr>
+                                <tr>
+                                    <td>1.0</td>
+                                    <td>Jan 05, 2025</td>
+                                    <td>Initial BOM creation</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        
+                        <h4>Production Notes</h4>
+                        <p>Special handling required for waterproof coating application. Quality check for stitching durability to be performed at 25% intervals during production.</p>
+                    </div>
+                </div>
+
+                <h4>Component Hierarchy</h4>
+                <div class="tree-view">
+                    <div class="tree-item">
+                        <i class="material-icons">inventory_2</i>
+                        <span><strong>Car Seat Cover - Model A</strong> (Final Assembly) | 1 unit</span>
+                    </div>
+                    <div class="tree-item tree-level-1">
+                        <i class="material-icons">texture</i>
+                        <span><strong>Technical Textile - Grade A</strong> (Raw Material) | 1.5 m²</span>
+                    </div>
+                    <div class="tree-item tree-level-1">
+                        <i class="material-icons">texture</i>
+                        <span><strong>Foam Padding</strong> (Raw Material) | 0.75 m²</span>
+                    </div>
+                    <div class="tree-item tree-level-1">
+                        <i class="material-icons">layers</i>
+                        <span><strong>Laminated Panel</strong> (Semi-Finished) | 1 unit</span>
+                    </div>
+                    <div class="tree-item tree-level-2">
+                        <i class="material-icons">texture</i>
+                        <span><strong>Technical Textile - Grade B</strong> (Raw Material) | 1.5 m²</span>
+                    </div>
+                    <div class="tree-item tree-level-2">
+                        <i class="material-icons">opacity</i>
+                        <span><strong>Waterproof Membrane</strong> (Raw Material) | 1.5 m²</span>
+                    </div>
+                    <div class="tree-item tree-level-1">
+                        <i class="material-icons">format_align_center</i>
+                        <span><strong>Cut Panels</strong> (Semi-Finished) | 5 pieces</span>
+                    </div>
+                    <div class="tree-item tree-level-1">
+                        <i class="material-icons">linear_scale</i>
+                        <span><strong>Polyester Thread - Black</strong> (Raw Material) | 25 meters</span>
+                    </div>
+                    <div class="tree-item tree-level-1">
+                        <i class="material-icons">branding_watermark</i>
+                        <span><strong>Brand Label</strong> (Raw Material) | 1 piece</span>
+                    </div>
+                </div>
+
+                <h4>BOM Visualization</h4>
+                <div class="bom-visualization"></div>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <div class="container">
+            <p>Zervi MRP Application UI Preview - Bill of Materials Management</p>
+            <p><a href="../index.html" style="color: #1976d2; text-decoration: none;">Back to Main Navigation</a></p>
+        </div>
+    </footer>
+</body>
+</html>

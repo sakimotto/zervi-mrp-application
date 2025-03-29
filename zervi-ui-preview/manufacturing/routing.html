@@ -1,0 +1,758 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Zervi MRP - Production Routing</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap" />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons" />
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f5f5f5;
+            color: #333;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        header {
+            background-color: #1976d2;
+            color: white;
+            padding: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        h1, h2, h3, h4 {
+            margin-top: 0;
+            font-weight: 400;
+        }
+        .card {
+            background-color: white;
+            border-radius: 4px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            overflow: hidden;
+            margin-bottom: 20px;
+        }
+        .card-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 16px;
+            border-bottom: 1px solid #eee;
+        }
+        .card-title {
+            display: flex;
+            align-items: center;
+        }
+        .card-title i {
+            margin-right: 8px;
+            color: #1976d2;
+        }
+        .card-content {
+            padding: 16px;
+        }
+        .btn {
+            background-color: transparent;
+            color: #1976d2;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            text-transform: uppercase;
+        }
+        .btn:hover {
+            background-color: rgba(25, 118, 210, 0.1);
+        }
+        .btn-primary {
+            background-color: #1976d2;
+            color: white;
+        }
+        .btn-primary:hover {
+            background-color: #1565c0;
+        }
+        .breadcrumb {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        .breadcrumb a {
+            color: #1976d2;
+            text-decoration: none;
+        }
+        .breadcrumb span {
+            margin: 0 5px;
+        }
+        nav {
+            display: flex;
+            background-color: white;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .nav-item {
+            padding: 15px 20px;
+            color: #666;
+            text-decoration: none;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+        }
+        .nav-item i {
+            margin-right: 5px;
+        }
+        .nav-item.active {
+            color: #1976d2;
+            border-bottom: 2px solid #1976d2;
+        }
+        .nav-item:hover {
+            background-color: #f5f5f5;
+        }
+        footer {
+            margin-top: 40px;
+            padding: 20px;
+            text-align: center;
+            color: #666;
+            font-size: 0.9em;
+        }
+        .tab-bar {
+            display: flex;
+            background-color: white;
+            border-radius: 4px;
+            overflow: hidden;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        .tab {
+            padding: 15px 25px;
+            cursor: pointer;
+            font-weight: 500;
+        }
+        .tab.active {
+            background-color: #1976d2;
+            color: white;
+        }
+        .tab:hover:not(.active) {
+            background-color: #f5f5f5;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        thead {
+            background-color: #f5f5f5;
+        }
+        th, td {
+            text-align: left;
+            padding: 12px 15px;
+            border-bottom: 1px solid #eee;
+        }
+        tr:hover {
+            background-color: #f9f9f9;
+        }
+        .search-bar {
+            display: flex;
+            margin-bottom: 20px;
+        }
+        .search-input {
+            flex: 1;
+            padding: 10px 15px;
+            border: 1px solid #ddd;
+            border-radius: 4px 0 0 4px;
+            font-size: 16px;
+        }
+        .search-button {
+            background-color: #1976d2;
+            color: white;
+            border: none;
+            padding: 0 20px;
+            border-radius: 0 4px 4px 0;
+            cursor: pointer;
+        }
+        .filter-bar {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        .filter-chip {
+            background-color: #e3f2fd;
+            color: #1976d2;
+            padding: 5px 12px;
+            border-radius: 16px;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+        }
+        .filter-chip i {
+            font-size: 16px;
+            margin-left: 5px;
+        }
+        .status-badge {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+        .status-active {
+            background-color: #e8f5e9;
+            color: #4caf50;
+        }
+        .status-pending {
+            background-color: #fff8e1;
+            color: #ff9800;
+        }
+        .status-obsolete {
+            background-color: #ffebee;
+            color: #f44336;
+        }
+        .grid-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+        @media (max-width: 768px) {
+            .grid-2 {
+                grid-template-columns: 1fr;
+            }
+        }
+        .info-box {
+            padding: 15px;
+            background-color: #e3f2fd;
+            border-radius: 4px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: flex-start;
+        }
+        .info-box i {
+            margin-right: 10px;
+            color: #1976d2;
+        }
+        .routing-diagram {
+            height: 350px;
+            background-color: #f9f9f9;
+            border-radius: 4px;
+            position: relative;
+            margin: 20px 0;
+        }
+        .routing-diagram::after {
+            content: "Production routing visualization would appear here";
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: #999;
+        }
+        .timeline {
+            position: relative;
+            padding: 20px 0;
+        }
+        .timeline::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 50px;
+            height: 100%;
+            width: 2px;
+            background-color: #ddd;
+        }
+        .timeline-item {
+            position: relative;
+            padding-left: 80px;
+            margin-bottom: 30px;
+        }
+        .timeline-icon {
+            position: absolute;
+            left: 42px;
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background-color: #1976d2;
+            transform: translateX(-50%);
+            z-index: 1;
+        }
+        .timeline-content {
+            background-color: white;
+            padding: 15px;
+            border-radius: 4px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .timeline-title {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+        }
+        .timeline-title h4 {
+            margin: 0;
+        }
+        .timeline-body {
+            color: #666;
+        }
+        .operation-type {
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 500;
+            background-color: #e3f2fd;
+            color: #1976d2;
+        }
+        .operation-laminating {
+            background-color: #e8f5e9;
+            color: #4caf50;
+        }
+        .operation-cutting {
+            background-color: #e1f5fe;
+            color: #03a9f4;
+        }
+        .operation-sewing {
+            background-color: #fff8e1;
+            color: #ff9800;
+        }
+        .operation-embroidery {
+            background-color: #f3e5f5;
+            color: #9c27b0;
+        }
+        .operation-quality {
+            background-color: #ffebee;
+            color: #f44336;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <h1>Zervi MRP</h1>
+                <div style="display: flex; align-items: center; padding: 8px 16px; border-radius: 20px; background-color: rgba(255, 255, 255, 0.2);">
+                    Automotive Division <i class="material-icons" style="margin-left: 5px; font-size: 18px;">arrow_drop_down</i>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <nav>
+        <div class="container" style="display: flex;">
+            <a href="../dashboard/index.html" class="nav-item"><i class="material-icons">dashboard</i> Dashboard</a>
+            <a href="../inventory/index.html" class="nav-item"><i class="material-icons">inventory_2</i> Inventory</a>
+            <a href="index.html" class="nav-item active"><i class="material-icons">precision_manufacturing</i> Manufacturing</a>
+            <a href="#" class="nav-item"><i class="material-icons">shopping_cart</i> Sales</a>
+            <a href="#" class="nav-item"><i class="material-icons">local_shipping</i> Procurement</a>
+            <a href="../transfers/index.html" class="nav-item"><i class="material-icons">swap_horiz</i> Transfers</a>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="breadcrumb">
+            <a href="../index.html">Home</a>
+            <span>/</span>
+            <a href="index.html">Manufacturing</a>
+            <span>/</span>
+            <a href="#">Production Routing</a>
+        </div>
+
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+            <h2>Production Routing</h2>
+            <button class="btn btn-primary"><i class="material-icons" style="margin-right: 5px;">add</i> Create New Routing</button>
+        </div>
+
+        <div class="info-box">
+            <i class="material-icons">info</i>
+            <div>
+                <p>Production routing defines the sequence of operations required to manufacture products. Zervi's system supports specialized manufacturing operations including Laminating, Cutting, Sewing, and Embroidery with operation-specific parameters and metrics.</p>
+            </div>
+        </div>
+
+        <div class="tab-bar">
+            <div class="tab active">Routings</div>
+            <div class="tab">Work Centers</div>
+            <div class="tab">Operations</div>
+            <div class="tab">Workstations</div>
+        </div>
+
+        <div class="card">
+            <div class="card-header">
+                <div class="card-title">
+                    <i class="material-icons">route</i>
+                    <h3>Production Routings</h3>
+                </div>
+            </div>
+            <div class="card-content">
+                <div class="search-bar">
+                    <input type="text" class="search-input" placeholder="Search routings...">
+                    <button class="search-button"><i class="material-icons">search</i></button>
+                </div>
+
+                <div class="filter-bar">
+                    <div class="filter-chip">Product: All <i class="material-icons">arrow_drop_down</i></div>
+                    <div class="filter-chip">Status: All <i class="material-icons">arrow_drop_down</i></div>
+                    <div class="filter-chip">Work Center: All <i class="material-icons">arrow_drop_down</i></div>
+                </div>
+
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Routing ID</th>
+                            <th>Product</th>
+                            <th>Version</th>
+                            <th>Operations</th>
+                            <th>Total Time</th>
+                            <th>Status</th>
+                            <th>Last Updated</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>ROU-CAR-001</td>
+                            <td>Car Seat Cover - Model A</td>
+                            <td>1.2</td>
+                            <td>5</td>
+                            <td>48 min</td>
+                            <td><span class="status-badge status-active">Active</span></td>
+                            <td>Mar 16, 2025</td>
+                            <td>
+                                <button class="btn">View</button>
+                                <button class="btn">Edit</button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>ROU-CAR-002</td>
+                            <td>Car Seat Cover - Model B</td>
+                            <td>1.0</td>
+                            <td>6</td>
+                            <td>55 min</td>
+                            <td><span class="status-badge status-active">Active</span></td>
+                            <td>Mar 14, 2025</td>
+                            <td>
+                                <button class="btn">View</button>
+                                <button class="btn">Edit</button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>ROU-DCO-001</td>
+                            <td>Dashboard Cover - Premium</td>
+                            <td>2.1</td>
+                            <td>4</td>
+                            <td>35 min</td>
+                            <td><span class="status-badge status-active">Active</span></td>
+                            <td>Mar 12, 2025</td>
+                            <td>
+                                <button class="btn">View</button>
+                                <button class="btn">Edit</button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>ROU-DCO-002</td>
+                            <td>Dashboard Cover - Standard</td>
+                            <td>1.5</td>
+                            <td>3</td>
+                            <td>28 min</td>
+                            <td><span class="status-badge status-obsolete">Obsolete</span></td>
+                            <td>Feb 28, 2025</td>
+                            <td>
+                                <button class="btn">View</button>
+                                <button class="btn">Edit</button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>ROU-FLM-001</td>
+                            <td>Floor Mat - Standard</td>
+                            <td>1.3</td>
+                            <td>4</td>
+                            <td>32 min</td>
+                            <td><span class="status-badge status-active">Active</span></td>
+                            <td>Mar 10, 2025</td>
+                            <td>
+                                <button class="btn">View</button>
+                                <button class="btn">Edit</button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>ROU-FLM-002</td>
+                            <td>Floor Mat - Deluxe</td>
+                            <td>1.0</td>
+                            <td>5</td>
+                            <td>42 min</td>
+                            <td><span class="status-badge status-pending">Pending</span></td>
+                            <td>Mar 25, 2025</td>
+                            <td>
+                                <button class="btn">View</button>
+                                <button class="btn">Edit</button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <div style="display: flex; justify-content: flex-end; margin-top: 20px; align-items: center;">
+                    <span style="margin-right: 20px;">Showing 1-6 of 22 routings</span>
+                    <button class="btn" disabled>Previous</button>
+                    <button class="btn">Next</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header">
+                <div class="card-title">
+                    <i class="material-icons">view_timeline</i>
+                    <h3>Routing Details: Car Seat Cover - Model A</h3>
+                </div>
+            </div>
+            <div class="card-content">
+                <div class="grid-2">
+                    <div>
+                        <h4>Routing Information</h4>
+                        <table style="margin-bottom: 20px;">
+                            <tr>
+                                <th style="width: 150px;">Product:</th>
+                                <td>Car Seat Cover - Model A</td>
+                            </tr>
+                            <tr>
+                                <th>Routing ID:</th>
+                                <td>ROU-CAR-001</td>
+                            </tr>
+                            <tr>
+                                <th>Version:</th>
+                                <td>1.2 (Released on Mar 16, 2025)</td>
+                            </tr>
+                            <tr>
+                                <th>Status:</th>
+                                <td><span class="status-badge status-active">Active</span></td>
+                            </tr>
+                            <tr>
+                                <th>Total Operations:</th>
+                                <td>5</td>
+                            </tr>
+                            <tr>
+                                <th>Total Time:</th>
+                                <td>48 minutes</td>
+                            </tr>
+                            <tr>
+                                <th>Notes:</th>
+                                <td>Standard production route optimized for Automotive division. Includes specialized laminating and cutting operations with quality check at final stage.</td>
+                            </tr>
+                        </table>
+                    </div>
+                    
+                    <div>
+                        <h4>Version History</h4>
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Version</th>
+                                    <th>Date</th>
+                                    <th>Changes</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>1.2</td>
+                                    <td>Mar 16, 2025</td>
+                                    <td>Optimized sewing operation time, added quality inspection</td>
+                                </tr>
+                                <tr>
+                                    <td>1.1</td>
+                                    <td>Feb 12, 2025</td>
+                                    <td>Updated cutting parameters for improved efficiency</td>
+                                </tr>
+                                <tr>
+                                    <td>1.0</td>
+                                    <td>Jan 08, 2025</td>
+                                    <td>Initial routing creation</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <h4>Operation Sequence</h4>
+                <div class="timeline">
+                    <div class="timeline-item">
+                        <div class="timeline-icon"></div>
+                        <div class="timeline-content">
+                            <div class="timeline-title">
+                                <h4>Operation 10: Laminating</h4>
+                                <span class="operation-type operation-laminating">Laminating</span>
+                            </div>
+                            <div class="timeline-body">
+                                <table>
+                                    <tr>
+                                        <th style="width: 150px;">Work Center:</th>
+                                        <td>Laminating Department</td>
+                                    </tr>
+                                    <tr>
+                                        <th>Workstation:</th>
+                                        <td>Industrial Laminator #2</td>
+                                    </tr>
+                                    <tr>
+                                        <th>Setup Time:</th>
+                                        <td>5 minutes</td>
+                                    </tr>
+                                    <tr>
+                                        <th>Run Time:</th>
+                                        <td>8 minutes per unit</td>
+                                    </tr>
+                                    <tr>
+                                        <th>Description:</th>
+                                        <td>Laminate technical textile with foam padding. Temperature: 160°C, Pressure: 2.5 bar, Speed: 2m/min.</td>
+                                    </tr>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="timeline-item">
+                        <div class="timeline-icon"></div>
+                        <div class="timeline-content">
+                            <div class="timeline-title">
+                                <h4>Operation 20: Cutting</h4>
+                                <span class="operation-type operation-cutting">Cutting</span>
+                            </div>
+                            <div class="timeline-body">
+                                <table>
+                                    <tr>
+                                        <th style="width: 150px;">Work Center:</th>
+                                        <td>Cutting Department</td>
+                                    </tr>
+                                    <tr>
+                                        <th>Workstation:</th>
+                                        <td>CNC Cutter #1</td>
+                                    </tr>
+                                    <tr>
+                                        <th>Setup Time:</th>
+                                        <td>3 minutes</td>
+                                    </tr>
+                                    <tr>
+                                        <th>Run Time:</th>
+                                        <td>7 minutes per unit</td>
+                                    </tr>
+                                    <tr>
+                                        <th>Description:</th>
+                                        <td>Cut laminated material into panels according to CAD pattern. Program: CAR-A-SEAT-V12, Blade: Type C, Offset: 0.2mm.</td>
+                                    </tr>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="timeline-item">
+                        <div class="timeline-icon"></div>
+                        <div class="timeline-content">
+                            <div class="timeline-title">
+                                <h4>Operation 30: Sewing - Main Assembly</h4>
+                                <span class="operation-type operation-sewing">Sewing</span>
+                            </div>
+                            <div class="timeline-body">
+                                <table>
+                                    <tr>
+                                        <th style="width: 150px;">Work Center:</th>
+                                        <td>Sewing Department</td>
+                                    </tr>
+                                    <tr>
+                                        <th>Workstation:</th>
+                                        <td>Industrial Sewing Machine #4</td>
+                                    </tr>
+                                    <tr>
+                                        <th>Setup Time:</th>
+                                        <td>2 minutes</td>
+                                    </tr>
+                                    <tr>
+                                        <th>Run Time:</th>
+                                        <td>15 minutes per unit</td>
+                                    </tr>
+                                    <tr>
+                                        <th>Description:</th>
+                                        <td>Join cut panels using reinforced double-stitch technique. Thread: Black Polyester, Stitch Length: 3mm, Tension: Medium.</td>
+                                    </tr>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="timeline-item">
+                        <div class="timeline-icon"></div>
+                        <div class="timeline-content">
+                            <div class="timeline-title">
+                                <h4>Operation 40: Embroidery</h4>
+                                <span class="operation-type operation-embroidery">Embroidery</span>
+                            </div>
+                            <div class="timeline-body">
+                                <table>
+                                    <tr>
+                                        <th style="width: 150px;">Work Center:</th>
+                                        <td>Embroidery Department</td>
+                                    </tr>
+                                    <tr>
+                                        <th>Workstation:</th>
+                                        <td>Digital Embroidery Machine #2</td>
+                                    </tr>
+                                    <tr>
+                                        <th>Setup Time:</th>
+                                        <td>1 minute</td>
+                                    </tr>
+                                    <tr>
+                                        <th>Run Time:</th>
+                                        <td>5 minutes per unit</td>
+                                    </tr>
+                                    <tr>
+                                        <th>Description:</th>
+                                        <td>Apply company logo and product identifiers. Pattern: AUTO-LOGO-STD, Thread: Black/Silver, Density: 60%.</td>
+                                    </tr>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="timeline-item">
+                        <div class="timeline-icon"></div>
+                        <div class="timeline-content">
+                            <div class="timeline-title">
+                                <h4>Operation 50: Quality Inspection</h4>
+                                <span class="operation-type operation-quality">Quality Control</span>
+                            </div>
+                            <div class="timeline-body">
+                                <table>
+                                    <tr>
+                                        <th style="width: 150px;">Work Center:</th>
+                                        <td>Quality Control</td>
+                                    </tr>
+                                    <tr>
+                                        <th>Workstation:</th>
+                                        <td>Manual Inspection Station #1</td>
+                                    </tr>
+                                    <tr>
+                                        <th>Setup Time:</th>
+                                        <td>0 minutes</td>
+                                    </tr>
+                                    <tr>
+                                        <th>Run Time:</th>
+                                        <td>2 minutes per unit</td>
+                                    </tr>
+                                    <tr>
+                                        <th>Description:</th>
+                                        <td>Perform final quality check. Verify stitching strength, embroidery quality, dimensions, and visual appearance. Check against quality standard QS-AUTO-SEAT-A.</td>
+                                    </tr>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <h4>Routing Visualization</h4>
+                <div class="routing-diagram"></div>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <div class="container">
+            <p>Zervi MRP Application UI Preview - Production Routing</p>
+            <p><a href="../index.html" style="color: #1976d2; text-decoration: none;">Back to Main Navigation</a></p>
+        </div>
+    </footer>
+</body>
+</html>

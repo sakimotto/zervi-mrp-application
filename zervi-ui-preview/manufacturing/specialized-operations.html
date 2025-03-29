@@ -1,0 +1,679 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Zervi MRP - Specialized Manufacturing Operations</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap" />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons" />
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f5f5f5;
+            color: #333;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        header {
+            background-color: #1976d2;
+            color: white;
+            padding: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        h1, h2, h3, h4 {
+            margin-top: 0;
+            font-weight: 400;
+        }
+        .card {
+            background-color: white;
+            border-radius: 4px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            overflow: hidden;
+            margin-bottom: 20px;
+        }
+        .card-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 16px;
+            border-bottom: 1px solid #eee;
+        }
+        .card-title {
+            display: flex;
+            align-items: center;
+        }
+        .card-title i {
+            margin-right: 8px;
+            color: #1976d2;
+        }
+        .card-content {
+            padding: 16px;
+        }
+        .btn {
+            background-color: transparent;
+            color: #1976d2;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            text-transform: uppercase;
+        }
+        .btn:hover {
+            background-color: rgba(25, 118, 210, 0.1);
+        }
+        .btn-primary {
+            background-color: #1976d2;
+            color: white;
+        }
+        .btn-primary:hover {
+            background-color: #1565c0;
+        }
+        .breadcrumb {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        .breadcrumb a {
+            color: #1976d2;
+            text-decoration: none;
+        }
+        .breadcrumb span {
+            margin: 0 5px;
+        }
+        nav {
+            display: flex;
+            background-color: white;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .nav-item {
+            padding: 15px 20px;
+            color: #666;
+            text-decoration: none;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+        }
+        .nav-item i {
+            margin-right: 5px;
+        }
+        .nav-item.active {
+            color: #1976d2;
+            border-bottom: 2px solid #1976d2;
+        }
+        .nav-item:hover {
+            background-color: #f5f5f5;
+        }
+        footer {
+            margin-top: 40px;
+            padding: 20px;
+            text-align: center;
+            color: #666;
+            font-size: 0.9em;
+        }
+        .tab-bar {
+            display: flex;
+            background-color: white;
+            border-radius: 4px;
+            overflow: hidden;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        .tab {
+            padding: 15px 25px;
+            cursor: pointer;
+            font-weight: 500;
+        }
+        .tab.active {
+            background-color: #1976d2;
+            color: white;
+        }
+        .tab:hover:not(.active) {
+            background-color: #f5f5f5;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        thead {
+            background-color: #f5f5f5;
+        }
+        th, td {
+            text-align: left;
+            padding: 12px 15px;
+            border-bottom: 1px solid #eee;
+        }
+        tr:hover {
+            background-color: #f9f9f9;
+        }
+        .info-box {
+            padding: 15px;
+            background-color: #e3f2fd;
+            border-radius: 4px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: flex-start;
+        }
+        .info-box i {
+            margin-right: 10px;
+            color: #1976d2;
+        }
+        .grid-3 {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+        }
+        @media (max-width: 900px) {
+            .grid-3 {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+        @media (max-width: 600px) {
+            .grid-3 {
+                grid-template-columns: 1fr;
+            }
+        }
+        .operation-card {
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+        }
+        .operation-header {
+            padding: 16px;
+            border-top-left-radius: 4px;
+            border-top-right-radius: 4px;
+            color: white;
+        }
+        .operation-laminating {
+            background-color: #4caf50;
+        }
+        .operation-cutting {
+            background-color: #03a9f4;
+        }
+        .operation-sewing {
+            background-color: #ff9800;
+        }
+        .operation-embroidery {
+            background-color: #9c27b0;
+        }
+        .operation-header h3 {
+            margin: 0;
+            display: flex;
+            align-items: center;
+        }
+        .operation-header i {
+            margin-right: 8px;
+        }
+        .operation-content {
+            padding: 16px;
+            flex: 1;
+        }
+        .operation-footer {
+            padding: 16px;
+            border-top: 1px solid #eee;
+            text-align: right;
+        }
+        .parameter-list {
+            list-style-type: none;
+            padding: 0;
+            margin: 15px 0;
+        }
+        .parameter-list li {
+            padding: 8px 0;
+            border-bottom: 1px dashed #eee;
+            display: flex;
+            justify-content: space-between;
+        }
+        .parameter-name {
+            color: #666;
+        }
+        .parameter-value {
+            font-weight: 500;
+        }
+        .machine-gallery {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            margin-top: 15px;
+        }
+        .machine-tile {
+            padding: 10px;
+            background-color: #f5f5f5;
+            border-radius: 4px;
+            text-align: center;
+        }
+        .machine-image {
+            height: 80px;
+            background-color: #ddd;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 8px;
+            color: #999;
+        }
+        .progress-bar {
+            height: 8px;
+            background-color: #eee;
+            border-radius: 4px;
+            overflow: hidden;
+            margin-top: 5px;
+        }
+        .progress-fill {
+            height: 100%;
+            background-color: #1976d2;
+        }
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            margin-top: 15px;
+        }
+        .metric-tile {
+            padding: 15px;
+            background-color: #f5f5f5;
+            border-radius: 4px;
+            text-align: center;
+        }
+        .metric-value {
+            font-size: 24px;
+            font-weight: 500;
+            margin-bottom: 5px;
+        }
+        .metric-name {
+            color: #666;
+            font-size: 14px;
+        }
+        .quality-check {
+            display: flex;
+            align-items: center;
+            padding: 8px 0;
+            border-bottom: 1px solid #eee;
+        }
+        .quality-check i {
+            margin-right: 10px;
+            color: #4caf50;
+        }
+        .quality-check-failed i {
+            color: #f44336;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <h1>Zervi MRP</h1>
+                <div style="display: flex; align-items: center; padding: 8px 16px; border-radius: 20px; background-color: rgba(255, 255, 255, 0.2);">
+                    Automotive Division <i class="material-icons" style="margin-left: 5px; font-size: 18px;">arrow_drop_down</i>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <nav>
+        <div class="container" style="display: flex;">
+            <a href="../dashboard/index.html" class="nav-item"><i class="material-icons">dashboard</i> Dashboard</a>
+            <a href="../inventory/index.html" class="nav-item"><i class="material-icons">inventory_2</i> Inventory</a>
+            <a href="index.html" class="nav-item active"><i class="material-icons">precision_manufacturing</i> Manufacturing</a>
+            <a href="#" class="nav-item"><i class="material-icons">shopping_cart</i> Sales</a>
+            <a href="#" class="nav-item"><i class="material-icons">local_shipping</i> Procurement</a>
+            <a href="../transfers/index.html" class="nav-item"><i class="material-icons">swap_horiz</i> Transfers</a>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="breadcrumb">
+            <a href="../index.html">Home</a>
+            <span>/</span>
+            <a href="index.html">Manufacturing</a>
+            <span>/</span>
+            <a href="#">Specialized Operations</a>
+        </div>
+
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+            <h2>Specialized Manufacturing Operations</h2>
+            <button class="btn btn-primary"><i class="material-icons" style="margin-right: 5px;">settings</i> Configure Operations</button>
+        </div>
+
+        <div class="info-box">
+            <i class="material-icons">info</i>
+            <div>
+                <p>Zervi Group's manufacturing capabilities include specialized operations customized for textile-based products. The system provides dedicated tracking for Laminating, Cutting, Sewing, and Embroidery with operation-specific parameters and quality metrics.</p>
+            </div>
+        </div>
+
+        <div class="grid-3">
+            <!-- Laminating Card -->
+            <div class="card operation-card">
+                <div class="operation-header operation-laminating">
+                    <h3><i class="material-icons">layers</i> Laminating Operations</h3>
+                </div>
+                <div class="operation-content">
+                    <p>Bonding of multiple layers of fabric, foam, or other materials using heat and pressure to create composite materials with specific properties.</p>
+                    
+                    <h4>Operation Parameters</h4>
+                    <ul class="parameter-list">
+                        <li>
+                            <span class="parameter-name">Temperature Range:</span>
+                            <span class="parameter-value">120°C - 180°C</span>
+                        </li>
+                        <li>
+                            <span class="parameter-name">Pressure Range:</span>
+                            <span class="parameter-value">1.5 - 3.5 bar</span>
+                        </li>
+                        <li>
+                            <span class="parameter-name">Speed Range:</span>
+                            <span class="parameter-value">1 - 4 m/min</span>
+                        </li>
+                        <li>
+                            <span class="parameter-name">Layer Support:</span>
+                            <span class="parameter-value">2 - 4 layers</span>
+                        </li>
+                    </ul>
+                    
+                    <h4>Equipment</h4>
+                    <div class="machine-gallery">
+                        <div class="machine-tile">
+                            <div class="machine-image">Industrial Laminator #1</div>
+                            <div>Industrial Laminator #1</div>
+                            <div style="display: flex; justify-content: space-between; font-size: 12px;">
+                                <span>Utilization:</span>
+                                <span>85%</span>
+                            </div>
+                            <div class="progress-bar">
+                                <div class="progress-fill" style="width: 85%;"></div>
+                            </div>
+                        </div>
+                        <div class="machine-tile">
+                            <div class="machine-image">Industrial Laminator #2</div>
+                            <div>Industrial Laminator #2</div>
+                            <div style="display: flex; justify-content: space-between; font-size: 12px;">
+                                <span>Utilization:</span>
+                                <span>72%</span>
+                            </div>
+                            <div class="progress-bar">
+                                <div class="progress-fill" style="width: 72%;"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="operation-footer">
+                    <button class="btn">View Details</button>
+                </div>
+            </div>
+            
+            <!-- Cutting Card -->
+            <div class="card operation-card">
+                <div class="operation-header operation-cutting">
+                    <h3><i class="material-icons">content_cut</i> Cutting Operations</h3>
+                </div>
+                <div class="operation-content">
+                    <p>Precision cutting of fabric and laminated materials using automated CNC cutters and die-cutting technology to ensure accuracy and reduce waste.</p>
+                    
+                    <h4>Operation Parameters</h4>
+                    <ul class="parameter-list">
+                        <li>
+                            <span class="parameter-name">Cutting Methods:</span>
+                            <span class="parameter-value">CNC, Die, Laser</span>
+                        </li>
+                        <li>
+                            <span class="parameter-name">Precision:</span>
+                            <span class="parameter-value">±0.2mm</span>
+                        </li>
+                        <li>
+                            <span class="parameter-name">Material Thickness:</span>
+                            <span class="parameter-value">0.1 - 12mm</span>
+                        </li>
+                        <li>
+                            <span class="parameter-name">Max Cut Area:</span>
+                            <span class="parameter-value">2.5m × 1.8m</span>
+                        </li>
+                    </ul>
+                    
+                    <h4>Equipment</h4>
+                    <div class="machine-gallery">
+                        <div class="machine-tile">
+                            <div class="machine-image">CNC Cutter #1</div>
+                            <div>CNC Cutter #1</div>
+                            <div style="display: flex; justify-content: space-between; font-size: 12px;">
+                                <span>Utilization:</span>
+                                <span>92%</span>
+                            </div>
+                            <div class="progress-bar">
+                                <div class="progress-fill" style="width: 92%;"></div>
+                            </div>
+                        </div>
+                        <div class="machine-tile">
+                            <div class="machine-image">Laser Cutter</div>
+                            <div>Laser Cutter</div>
+                            <div style="display: flex; justify-content: space-between; font-size: 12px;">
+                                <span>Utilization:</span>
+                                <span>68%</span>
+                            </div>
+                            <div class="progress-bar">
+                                <div class="progress-fill" style="width: 68%;"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="operation-footer">
+                    <button class="btn">View Details</button>
+                </div>
+            </div>
+            
+            <!-- Sewing Card -->
+            <div class="card operation-card">
+                <div class="operation-header operation-sewing">
+                    <h3><i class="material-icons">design_services</i> Sewing Operations</h3>
+                </div>
+                <div class="operation-content">
+                    <p>Assembly of cut panels using various stitching techniques and thread types to create finished textile products with specific durability and appearance requirements.</p>
+                    
+                    <h4>Operation Parameters</h4>
+                    <ul class="parameter-list">
+                        <li>
+                            <span class="parameter-name">Stitch Types:</span>
+                            <span class="parameter-value">Single, Double, Zigzag</span>
+                        </li>
+                        <li>
+                            <span class="parameter-name">Thread Types:</span>
+                            <span class="parameter-value">Polyester, Nylon, Kevlar</span>
+                        </li>
+                        <li>
+                            <span class="parameter-name">Stitch Density:</span>
+                            <span class="parameter-value">3-7 per cm</span>
+                        </li>
+                        <li>
+                            <span class="parameter-name">Max Thickness:</span>
+                            <span class="parameter-value">12mm</span>
+                        </li>
+                    </ul>
+                    
+                    <h4>Equipment</h4>
+                    <div class="machine-gallery">
+                        <div class="machine-tile">
+                            <div class="machine-image">Industrial Sewing #4</div>
+                            <div>Industrial Sewing #4</div>
+                            <div style="display: flex; justify-content: space-between; font-size: 12px;">
+                                <span>Utilization:</span>
+                                <span>88%</span>
+                            </div>
+                            <div class="progress-bar">
+                                <div class="progress-fill" style="width: 88%;"></div>
+                            </div>
+                        </div>
+                        <div class="machine-tile">
+                            <div class="machine-image">Automated Sewing</div>
+                            <div>Automated Sewing</div>
+                            <div style="display: flex; justify-content: space-between; font-size: 12px;">
+                                <span>Utilization:</span>
+                                <span>79%</span>
+                            </div>
+                            <div class="progress-bar">
+                                <div class="progress-fill" style="width: 79%;"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="operation-footer">
+                    <button class="btn">View Details</button>
+                </div>
+            </div>
+            
+            <!-- Embroidery Card -->
+            <div class="card operation-card">
+                <div class="operation-header operation-embroidery">
+                    <h3><i class="material-icons">brush</i> Embroidery Operations</h3>
+                </div>
+                <div class="operation-content">
+                    <p>Application of decorative patterns, logos, and branding elements onto textile products using computer-controlled digital embroidery machines.</p>
+                    
+                    <h4>Operation Parameters</h4>
+                    <ul class="parameter-list">
+                        <li>
+                            <span class="parameter-name">Max Colors:</span>
+                            <span class="parameter-value">12 colors</span>
+                        </li>
+                        <li>
+                            <span class="parameter-name">Max Area:</span>
+                            <span class="parameter-value">35cm × 35cm</span>
+                        </li>
+                        <li>
+                            <span class="parameter-name">Stitch Density:</span>
+                            <span class="parameter-value">30-120 per cm²</span>
+                        </li>
+                        <li>
+                            <span class="parameter-name">Thread Types:</span>
+                            <span class="parameter-value">Polyester, Rayon, Metallic</span>
+                        </li>
+                    </ul>
+                    
+                    <h4>Equipment</h4>
+                    <div class="machine-gallery">
+                        <div class="machine-tile">
+                            <div class="machine-image">Digital Embroidery #2</div>
+                            <div>Digital Embroidery #2</div>
+                            <div style="display: flex; justify-content: space-between; font-size: 12px;">
+                                <span>Utilization:</span>
+                                <span>75%</span>
+                            </div>
+                            <div class="progress-bar">
+                                <div class="progress-fill" style="width: 75%;"></div>
+                            </div>
+                        </div>
+                        <div class="machine-tile">
+                            <div class="machine-image">Digital Embroidery #3</div>
+                            <div>Digital Embroidery #3</div>
+                            <div style="display: flex; justify-content: space-between; font-size: 12px;">
+                                <span>Utilization:</span>
+                                <span>63%</span>
+                            </div>
+                            <div class="progress-bar">
+                                <div class="progress-fill" style="width: 63%;"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="operation-footer">
+                    <button class="btn">View Details</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header">
+                <div class="card-title">
+                    <i class="material-icons">analytics</i>
+                    <h3>Manufacturing Metrics</h3>
+                </div>
+            </div>
+            <div class="card-content">
+                <div class="metrics-grid">
+                    <div class="metric-tile">
+                        <div class="metric-value">92.5%</div>
+                        <div class="metric-name">Overall Equipment Effectiveness</div>
+                    </div>
+                    <div class="metric-tile">
+                        <div class="metric-value">87.3%</div>
+                        <div class="metric-name">First Pass Yield</div>
+                    </div>
+                    <div class="metric-tile">
+                        <div class="metric-value">3.1%</div>
+                        <div class="metric-name">Defect Rate</div>
+                    </div>
+                    <div class="metric-tile">
+                        <div class="metric-value">98.2%</div>
+                        <div class="metric-name">On-Time Completion</div>
+                    </div>
+                    <div class="metric-tile">
+                        <div class="metric-value">95.7%</div>
+                        <div class="metric-name">Resource Utilization</div>
+                    </div>
+                    <div class="metric-tile">
+                        <div class="metric-value">2.3 hrs</div>
+                        <div class="metric-name">Avg. Changeover Time</div>
+                    </div>
+                </div>
+
+                <h4 style="margin-top: 20px;">Current Quality Status</h4>
+                <div style="margin-top: 15px;">
+                    <div class="quality-check">
+                        <i class="material-icons">check_circle</i>
+                        <div style="flex: 1;">
+                            <div>Laminating Temperature Control</div>
+                            <div style="font-size: 12px; color: #666;">Last checked: Today, 07:15 AM</div>
+                        </div>
+                        <div>Pass</div>
+                    </div>
+                    <div class="quality-check">
+                        <i class="material-icons">check_circle</i>
+                        <div style="flex: 1;">
+                            <div>Cutting Precision Evaluation</div>
+                            <div style="font-size: 12px; color: #666;">Last checked: Today, 08:30 AM</div>
+                        </div>
+                        <div>Pass</div>
+                    </div>
+                    <div class="quality-check quality-check-failed">
+                        <i class="material-icons">error</i>
+                        <div style="flex: 1;">
+                            <div>Sewing Thread Tension Check</div>
+                            <div style="font-size: 12px; color: #666;">Last checked: Today, 09:45 AM</div>
+                        </div>
+                        <div style="color: #f44336;">Adjustments Needed</div>
+                    </div>
+                    <div class="quality-check">
+                        <i class="material-icons">check_circle</i>
+                        <div style="flex: 1;">
+                            <div>Embroidery Color Registration</div>
+                            <div style="font-size: 12px; color: #666;">Last checked: Yesterday, 04:30 PM</div>
+                        </div>
+                        <div>Pass</div>
+                    </div>
+                    <div class="quality-check">
+                        <i class="material-icons">check_circle</i>
+                        <div style="flex: 1;">
+                            <div>Final Product Dimensional Check</div>
+                            <div style="font-size: 12px; color: #666;">Last checked: Today, 10:15 AM</div>
+                        </div>
+                        <div>Pass</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <div class="container">
+            <p>Zervi MRP Application UI Preview - Specialized Manufacturing Operations</p>
+            <p><a href="../index.html" style="color: #1976d2; text-decoration: none;">Back to Main Navigation</a></p>
+        </div>
+    </footer>
+</body>
+</html>

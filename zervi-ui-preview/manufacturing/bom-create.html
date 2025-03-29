@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Zervi MRP - BOM Creation</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap" />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons" />
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f5f5f5;
+            color: #333;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        header {
+            background-color: #1976d2;
+            color: white;
+            padding: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        h1, h2, h3, h4 {
+            margin-top: 0;
+            font-weight: 400;
+        }
+        .card {
+            background-color: white;
+            border-radius: 4px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            overflow: hidden;
+            margin-bottom: 20px;
+        }
+        .card-header {
+            padding: 16px;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .card-title {
+            display: flex;
+            align-items: center;
+        }
+        .card-title i {
+            margin-right: 8px;
+            color: #1976d2;
+        }
+        .card-content {
+            padding: 16px;
+        }
+        .btn {
+            background-color: transparent;
+            color: #1976d2;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            text-transform: uppercase;
+        }
+        .btn:hover {
+            background-color: rgba(25, 118, 210, 0.1);
+        }
+        .btn-primary {
+            background-color: #1976d2;
+            color: white;
+        }
+        .btn-primary:hover {
+            background-color: #1565c0;
+        }
+        .breadcrumb {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        .breadcrumb a {
+            color: #1976d2;
+            text-decoration: none;
+        }
+        .breadcrumb span {
+            margin: 0 5px;
+        }
+        nav {
+            display: flex;
+            background-color: white;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .nav-item {
+            padding: 15px 20px;
+            color: #666;
+            text-decoration: none;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+        }
+        .nav-item i {
+            margin-right: 5px;
+        }
+        .nav-item.active {
+            color: #1976d2;
+            border-bottom: 2px solid #1976d2;
+        }
+        .nav-item:hover {
+            background-color: #f5f5f5;
+        }
+        footer {
+            margin-top: 40px;
+            padding: 20px;
+            text-align: center;
+            color: #666;
+            font-size: 0.9em;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        thead {
+            background-color: #f5f5f5;
+        }
+        th, td {
+            text-align: left;
+            padding: 12px 15px;
+            border-bottom: 1px solid #eee;
+        }
+        tr:hover {
+            background-color: #f9f9f9;
+        }
+        .info-box {
+            padding: 15px;
+            background-color: #e3f2fd;
+            border-radius: 4px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: flex-start;
+        }
+        .info-box i {
+            margin-right: 10px;
+            color: #1976d2;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+        input, select, textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box;
+            font-family: 'Roboto', sans-serif;
+        }
+        .grid-2 {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+        }
+        .component-row {
+            display: flex;
+            padding: 10px;
+            border: 1px solid #eee;
+            border-radius: 4px;
+            margin-bottom: 10px;
+            align-items: center;
+        }
+        .component-row button {
+            margin-left: 10px;
+        }
+        .component-drag {
+            cursor: move;
+            color: #999;
+            padding: 0 10px;
+        }
+        .form-actions {
+            display: flex;
+            justify-content: flex-end;
+            margin-top: 20px;
+            gap: 10px;
+        }
+        .tabs {
+            display: flex;
+            border-bottom: 1px solid #ddd;
+            margin-bottom: 20px;
+        }
+        .tab {
+            padding: 10px 20px;
+            cursor: pointer;
+            font-weight: 500;
+        }
+        .tab.active {
+            color: #1976d2;
+            border-bottom: 2px solid #1976d2;
+        }
+        .part-select {
+            display: flex;
+            align-items: center;
+        }
+        .part-select-img {
+            width: 40px;
+            height: 40px;
+            background-color: #f5f5f5;
+            margin-right: 10px;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <h1>Zervi MRP</h1>
+                <div style="display: flex; align-items: center; padding: 8px 16px; border-radius: 20px; background-color: rgba(255, 255, 255, 0.2);">
+                    Automotive Division <i class="material-icons" style="margin-left: 5px; font-size: 18px;">arrow_drop_down</i>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <nav>
+        <div class="container" style="display: flex;">
+            <a href="../dashboard/index.html" class="nav-item"><i class="material-icons">dashboard</i> Dashboard</a>
+            <a href="../inventory/index.html" class="nav-item"><i class="material-icons">inventory_2</i> Inventory</a>
+            <a href="index.html" class="nav-item active"><i class="material-icons">precision_manufacturing</i> Manufacturing</a>
+            <a href="#" class="nav-item"><i class="material-icons">shopping_cart</i> Sales</a>
+            <a href="#" class="nav-item"><i class="material-icons">local_shipping</i> Procurement</a>
+            <a href="../transfers/index.html" class="nav-item"><i class="material-icons">swap_horiz</i> Transfers</a>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="breadcrumb">
+            <a href="../index.html">Home</a>
+            <span>/</span>
+            <a href="index.html">Manufacturing</a>
+            <span>/</span>
+            <a href="bom.html">Bills of Materials</a>
+            <span>/</span>
+            <a href="#">Create BOM</a>
+        </div>
+
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+            <h2>Create New Bill of Materials</h2>
+            <div>
+                <button class="btn"><i class="material-icons" style="margin-right: 5px;">file_upload</i> Import</button>
+                <button class="btn btn-primary"><i class="material-icons" style="margin-right: 5px;">save</i> Save Draft</button>
+            </div>
+        </div>
+
+        <div class="info-box">
+            <i class="material-icons">info</i>
+            <div>
+                <p>Create a new multi-level Bill of Materials (BOM) by adding components, sub-assemblies, and raw materials. Ensure all quantities and units are correctly specified. Changes will be saved as a draft until approved.</p>
+            </div>
+        </div>
+
+        <div class="tabs">
+            <div class="tab active">Basic Information</div>
+            <div class="tab">Components</div>
+            <div class="tab">Attributes</div>
+            <div class="tab">Documents</div>
+        </div>
+
+        <div class="card">
+            <div class="card-header">
+                <div class="card-title">
+                    <i class="material-icons">description</i>
+                    <h3>BOM Details</h3>
+                </div>
+            </div>
+            <div class="card-content">
+                <div class="grid-2">
+                    <div class="form-group">
+                        <label for="bom-name">BOM Name</label>
+                        <input type="text" id="bom-name" placeholder="Car Seat Cover - Premium" value="Car Seat Cover - Premium">
+                    </div>
+                    <div class="form-group">
+                        <label for="bom-number">BOM Number</label>
+                        <input type="text" id="bom-number" placeholder="B-2025-0078" value="B-2025-0078">
+                    </div>
+                    <div class="form-group">
+                        <label for="product">Finished Product</label>
+                        <div class="part-select">
+                            <div class="part-select-img">
+                                <i class="material-icons">inventory_2</i>
+                            </div>
+                            <select id="product">
+                                <option value="auto-001" selected>Premium Car Seat Cover (MFGP-2023-021)</option>
+                                <option value="auto-002">Standard Car Seat Cover (MFGP-2023-022)</option>
+                                <option value="auto-003">Luxury Car Mat Set (MFGP-2023-025)</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="revision">Revision Number</label>
+                        <input type="text" id="revision" placeholder="A" value="A">
+                    </div>
+                    <div class="form-group">
+                        <label for="status">Status</label>
+                        <select id="status">
+                            <option value="draft" selected>Draft</option>
+                            <option value="in-review">In Review</option>
+                            <option value="approved">Approved</option>
+                            <option value="obsolete">Obsolete</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="bom-type">BOM Type</label>
+                        <select id="bom-type">
+                            <option value="manufacturing" selected>Manufacturing</option>
+                            <option value="engineering">Engineering</option>
+                            <option value="planning">Planning</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="description">Description</label>
+                    <textarea id="description" rows="3" placeholder="Enter BOM description">Premium car seat cover for luxury vehicles, featuring multi-layer construction with waterproof and breathable materials. Compatible with side airbags and designed for maximum comfort.</textarea>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header">
+                <div class="card-title">
+                    <i class="material-icons">list</i>
+                    <h3>Components</h3>
+                </div>
+                <button class="btn btn-primary"><i class="material-icons" style="margin-right: 5px;">add</i> Add Component</button>
+            </div>
+            <div class="card-content">
+                <table>
+                    <thead>
+                        <tr>
+                            <th style="width: 40px;"></th>
+                            <th>Level</th>
+                            <th>Item Number</th>
+                            <th>Description</th>
+                            <th>Type</th>
+                            <th>Quantity</th>
+                            <th>Unit</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><i class="material-icons component-drag">drag_indicator</i></td>
+                            <td>1</td>
+                            <td>FAB-PRM-001</td>
+                            <td>Waterproof Fabric - Premium</td>
+                            <td>Raw Material</td>
+                            <td>2.5</td>
+                            <td>m²</td>
+                            <td>
+                                <button class="btn"><i class="material-icons">edit</i></button>
+                                <button class="btn"><i class="material-icons">delete</i></button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><i class="material-icons component-drag">drag_indicator</i></td>
+                            <td>1</td>
+                            <td>FOAM-AUTO-002</td>
+                            <td>Memory Foam - 10mm</td>
+                            <td>Raw Material</td>
+                            <td>1.8</td>
+                            <td>m²</td>
+                            <td>
+                                <button class="btn"><i class="material-icons">edit</i></button>
+                                <button class="btn"><i class="material-icons">delete</i></button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><i class="material-icons component-drag">drag_indicator</i></td>
+                            <td>1</td>
+                            <td>ASSY-BACK-001</td>
+                            <td>Seat Back Assembly</td>
+                            <td>Sub-Assembly</td>
+                            <td>1</td>
+                            <td>pcs</td>
+                            <td>
+                                <button class="btn"><i class="material-icons">edit</i></button>
+                                <button class="btn"><i class="material-icons">delete</i></button>
+                            </td>
+                        </tr>
+                        <tr style="background-color: #f5f5f5;">
+                            <td><i class="material-icons component-drag">drag_indicator</i></td>
+                            <td>2</td>
+                            <td>FAB-BKG-001</td>
+                            <td>Backing Fabric - Non-slip</td>
+                            <td>Raw Material</td>
+                            <td>1.2</td>
+                            <td>m²</td>
+                            <td>
+                                <button class="btn"><i class="material-icons">edit</i></button>
+                                <button class="btn"><i class="material-icons">delete</i></button>
+                            </td>
+                        </tr>
+                        <tr style="background-color: #f5f5f5;">
+                            <td><i class="material-icons component-drag">drag_indicator</i></td>
+                            <td>2</td>
+                            <td>ZTP-VR-012</td>
+                            <td>Velcro Strip - 2.5cm</td>
+                            <td>Raw Material</td>
+                            <td>4</td>
+                            <td>m</td>
+                            <td>
+                                <button class="btn"><i class="material-icons">edit</i></button>
+                                <button class="btn"><i class="material-icons">delete</i></button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><i class="material-icons component-drag">drag_indicator</i></td>
+                            <td>1</td>
+                            <td>ZTP-ZP-008</td>
+                            <td>Premium Zipper - YKK</td>
+                            <td>Raw Material</td>
+                            <td>2</td>
+                            <td>pcs</td>
+                            <td>
+                                <button class="btn"><i class="material-icons">edit</i></button>
+                                <button class="btn"><i class="material-icons">delete</i></button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><i class="material-icons component-drag">drag_indicator</i></td>
+                            <td>1</td>
+                            <td>LOGO-EMB-AUTO</td>
+                            <td>Embroidered Logo - Automotive</td>
+                            <td>Raw Material</td>
+                            <td>1</td>
+                            <td>pcs</td>
+                            <td>
+                                <button class="btn"><i class="material-icons">edit</i></button>
+                                <button class="btn"><i class="material-icons">delete</i></button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+                
+                <div class="form-actions">
+                    <button class="btn">Cancel</button>
+                    <button class="btn btn-primary">Save & Continue</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <div class="container">
+            <p>Zervi MRP Application UI Preview - BOM Creation</p>
+            <p><a href="../index.html" style="color: #1976d2; text-decoration: none;">Back to Main Navigation</a></p>
+        </div>
+    </footer>
+</body>
+</html>

@@ -1,0 +1,599 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Zervi MRP - BOM Version Comparison</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap" />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons" />
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f5f5f5;
+            color: #333;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        header {
+            background-color: #1976d2;
+            color: white;
+            padding: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        h1, h2, h3, h4 {
+            margin-top: 0;
+            font-weight: 400;
+        }
+        .card {
+            background-color: white;
+            border-radius: 4px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            overflow: hidden;
+            margin-bottom: 20px;
+        }
+        .card-header {
+            padding: 16px;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .card-title {
+            display: flex;
+            align-items: center;
+        }
+        .card-title i {
+            margin-right: 8px;
+            color: #1976d2;
+        }
+        .card-content {
+            padding: 16px;
+        }
+        .btn {
+            background-color: transparent;
+            color: #1976d2;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            text-transform: uppercase;
+        }
+        .btn:hover {
+            background-color: rgba(25, 118, 210, 0.1);
+        }
+        .btn-primary {
+            background-color: #1976d2;
+            color: white;
+        }
+        .btn-primary:hover {
+            background-color: #1565c0;
+        }
+        .breadcrumb {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        .breadcrumb a {
+            color: #1976d2;
+            text-decoration: none;
+        }
+        .breadcrumb span {
+            margin: 0 5px;
+        }
+        nav {
+            display: flex;
+            background-color: white;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .nav-item {
+            padding: 15px 20px;
+            color: #666;
+            text-decoration: none;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+        }
+        .nav-item i {
+            margin-right: 5px;
+        }
+        .nav-item.active {
+            color: #1976d2;
+            border-bottom: 2px solid #1976d2;
+        }
+        .nav-item:hover {
+            background-color: #f5f5f5;
+        }
+        footer {
+            margin-top: 40px;
+            padding: 20px;
+            text-align: center;
+            color: #666;
+            font-size: 0.9em;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        thead {
+            background-color: #f5f5f5;
+        }
+        th, td {
+            text-align: left;
+            padding: 12px 15px;
+            border-bottom: 1px solid #eee;
+        }
+        tr:hover {
+            background-color: #f9f9f9;
+        }
+        .info-box {
+            padding: 15px;
+            background-color: #e3f2fd;
+            border-radius: 4px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: flex-start;
+        }
+        .info-box i {
+            margin-right: 10px;
+            color: #1976d2;
+        }
+        .version-selector {
+            display: grid;
+            grid-template-columns: 1fr 80px 1fr;
+            gap: 10px;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        .version-box {
+            background-color: white;
+            border-radius: 4px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            padding: 15px;
+        }
+        .version-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #eee;
+        }
+        .version-title {
+            flex: 1;
+            font-weight: 500;
+        }
+        .version-date {
+            color: #666;
+            font-size: 14px;
+        }
+        .version-status {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 500;
+            margin-left: 10px;
+        }
+        .status-active {
+            background-color: #e8f5e9;
+            color: #2e7d32;
+        }
+        .status-obsolete {
+            background-color: #ffebee;
+            color: #c62828;
+        }
+        .status-draft {
+            background-color: #fff8e1;
+            color: #f57f17;
+        }
+        .version-compare-icon {
+            text-align: center;
+            color: #1976d2;
+        }
+        .compare-table tr td:first-child {
+            font-weight: 500;
+            width: 200px;
+        }
+        .compare-table .unchanged {
+            background-color: #ffffff;
+        }
+        .compare-table .added {
+            background-color: #e8f5e9;
+        }
+        .compare-table .removed {
+            background-color: #ffebee;
+        }
+        .compare-table .modified {
+            background-color: #fff8e1;
+        }
+        .change-indicator {
+            display: flex;
+            align-items: center;
+            font-size: 14px;
+            margin-bottom: 5px;
+        }
+        .change-indicator i {
+            margin-right: 5px;
+            font-size: 16px;
+        }
+        .change-add {
+            color: #2e7d32;
+        }
+        .change-remove {
+            color: #c62828;
+        }
+        .change-modify {
+            color: #f57f17;
+        }
+        .change-legend {
+            display: flex;
+            justify-content: flex-end;
+            margin-bottom: 15px;
+            gap: 15px;
+        }
+        .component-diff-table td.arrow {
+            text-align: center;
+            font-weight: 500;
+            color: #1976d2;
+        }
+        .history-timeline {
+            margin: 30px 0;
+            position: relative;
+        }
+        .timeline-line {
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            left: 150px;
+            width: 2px;
+            background-color: #ddd;
+        }
+        .timeline-item {
+            position: relative;
+            margin-bottom: 30px;
+            padding-left: 170px;
+        }
+        .timeline-item:last-child {
+            margin-bottom: 0;
+        }
+        .timeline-date {
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 120px;
+            text-align: right;
+            font-weight: 500;
+        }
+        .timeline-marker {
+            position: absolute;
+            left: 143px;
+            top: 0;
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background-color: #1976d2;
+        }
+        .timeline-content {
+            padding: 15px;
+            background-color: white;
+            border-radius: 4px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <h1>Zervi MRP</h1>
+                <div style="display: flex; align-items: center; padding: 8px 16px; border-radius: 20px; background-color: rgba(255, 255, 255, 0.2);">
+                    Automotive Division <i class="material-icons" style="margin-left: 5px; font-size: 18px;">arrow_drop_down</i>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <nav>
+        <div class="container" style="display: flex;">
+            <a href="../dashboard/index.html" class="nav-item"><i class="material-icons">dashboard</i> Dashboard</a>
+            <a href="../inventory/index.html" class="nav-item"><i class="material-icons">inventory_2</i> Inventory</a>
+            <a href="index.html" class="nav-item active"><i class="material-icons">precision_manufacturing</i> Manufacturing</a>
+            <a href="#" class="nav-item"><i class="material-icons">shopping_cart</i> Sales</a>
+            <a href="#" class="nav-item"><i class="material-icons">local_shipping</i> Procurement</a>
+            <a href="../transfers/index.html" class="nav-item"><i class="material-icons">swap_horiz</i> Transfers</a>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="breadcrumb">
+            <a href="../index.html">Home</a>
+            <span>/</span>
+            <a href="index.html">Manufacturing</a>
+            <span>/</span>
+            <a href="bom.html">Bills of Materials</a>
+            <span>/</span>
+            <a href="#">BOM Version Compare</a>
+        </div>
+
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+            <h2>BOM Version Comparison</h2>
+            <div>
+                <button class="btn"><i class="material-icons" style="margin-right: 5px;">file_download</i> Export Diff</button>
+                <button class="btn btn-primary"><i class="material-icons" style="margin-right: 5px;">history</i> View History</button>
+            </div>
+        </div>
+
+        <div class="info-box">
+            <i class="material-icons">info</i>
+            <div>
+                <p>Compare different versions of a Bill of Materials to track changes in components, quantities, and specifications. Green highlights indicate additions, red indicates removals, and yellow indicates modifications.</p>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header">
+                <div class="card-title">
+                    <i class="material-icons">compare_arrows</i>
+                    <h3>Version Selection</h3>
+                </div>
+            </div>
+            <div class="card-content">
+                <div style="margin-bottom: 20px;">
+                    <select style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 4px;">
+                        <option selected>Car Seat Cover - Premium (B-2025-0078)</option>
+                        <option>Car Seat Cover - Standard (B-2025-0079)</option>
+                        <option>Luxury Car Mat Set (B-2025-0080)</option>
+                        <option>Dashboard Cover (B-2025-0085)</option>
+                    </select>
+                </div>
+
+                <div class="version-selector">
+                    <div class="version-box">
+                        <div class="version-header">
+                            <div class="version-title">Version C</div>
+                            <div class="version-status status-active">Active</div>
+                        </div>
+                        <div class="version-date">Released: Mar 15, 2025</div>
+                        <div style="margin-top: 10px;">
+                            <div>Author: J. Anderson</div>
+                            <div>ECO: ECO-2025-0114</div>
+                        </div>
+                    </div>
+                    <div class="version-compare-icon">
+                        <i class="material-icons" style="font-size: 32px;">compare_arrows</i>
+                    </div>
+                    <div class="version-box">
+                        <div class="version-header">
+                            <div class="version-title">Version B</div>
+                            <div class="version-status status-obsolete">Obsolete</div>
+                        </div>
+                        <div class="version-date">Released: Feb 2, 2025</div>
+                        <div style="margin-top: 10px;">
+                            <div>Author: S. Williams</div>
+                            <div>ECO: ECO-2025-0092</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="change-legend">
+                    <div class="change-indicator">
+                        <i class="material-icons change-add">add_circle</i>
+                        <span>Added</span>
+                    </div>
+                    <div class="change-indicator">
+                        <i class="material-icons change-remove">remove_circle</i>
+                        <span>Removed</span>
+                    </div>
+                    <div class="change-indicator">
+                        <i class="material-icons change-modify">change_circle</i>
+                        <span>Modified</span>
+                    </div>
+                </div>
+
+                <h4>BOM Header Comparison</h4>
+                <table class="compare-table">
+                    <tbody>
+                        <tr class="unchanged">
+                            <td>BOM Name</td>
+                            <td>Car Seat Cover - Premium</td>
+                            <td>Car Seat Cover - Premium</td>
+                        </tr>
+                        <tr class="unchanged">
+                            <td>BOM Number</td>
+                            <td>B-2025-0078</td>
+                            <td>B-2025-0078</td>
+                        </tr>
+                        <tr class="unchanged">
+                            <td>Finished Product</td>
+                            <td>Premium Car Seat Cover (MFGP-2023-021)</td>
+                            <td>Premium Car Seat Cover (MFGP-2023-021)</td>
+                        </tr>
+                        <tr class="modified">
+                            <td>Revision Number</td>
+                            <td>B</td>
+                            <td>C</td>
+                        </tr>
+                        <tr class="modified">
+                            <td>Status</td>
+                            <td>Obsolete</td>
+                            <td>Active</td>
+                        </tr>
+                        <tr class="unchanged">
+                            <td>BOM Type</td>
+                            <td>Manufacturing</td>
+                            <td>Manufacturing</td>
+                        </tr>
+                        <tr class="modified">
+                            <td>Description</td>
+                            <td>Premium car seat cover for luxury vehicles, featuring multi-layer construction with water-resistant materials.</td>
+                            <td>Premium car seat cover for luxury vehicles, featuring multi-layer construction with waterproof and breathable materials. Compatible with side airbags and designed for maximum comfort.</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header">
+                <div class="card-title">
+                    <i class="material-icons">list</i>
+                    <h3>Component Changes</h3>
+                </div>
+            </div>
+            <div class="card-content">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Change</th>
+                            <th>Level</th>
+                            <th>Item Number</th>
+                            <th>Description</th>
+                            <th>Version B</th>
+                            <th>Version C</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr class="modified">
+                            <td><i class="material-icons change-modify">change_circle</i></td>
+                            <td>1</td>
+                            <td>FAB-PRM-001</td>
+                            <td>Waterproof Fabric - Premium</td>
+                            <td>2.0 m²</td>
+                            <td>2.5 m²</td>
+                        </tr>
+                        <tr class="unchanged">
+                            <td></td>
+                            <td>1</td>
+                            <td>FOAM-AUTO-002</td>
+                            <td>Memory Foam - 10mm</td>
+                            <td>1.8 m²</td>
+                            <td>1.8 m²</td>
+                        </tr>
+                        <tr class="unchanged">
+                            <td></td>
+                            <td>1</td>
+                            <td>ASSY-BACK-001</td>
+                            <td>Seat Back Assembly</td>
+                            <td>1 pcs</td>
+                            <td>1 pcs</td>
+                        </tr>
+                        <tr style="background-color: #f5f5f5;">
+                            <td></td>
+                            <td>2</td>
+                            <td>FAB-BKG-001</td>
+                            <td>Backing Fabric - Non-slip</td>
+                            <td>1.2 m²</td>
+                            <td>1.2 m²</td>
+                        </tr>
+                        <tr style="background-color: #f5f5f5;">
+                            <td></td>
+                            <td>2</td>
+                            <td>ZTP-VR-012</td>
+                            <td>Velcro Strip - 2.5cm</td>
+                            <td>4 m</td>
+                            <td>4 m</td>
+                        </tr>
+                        <tr class="removed">
+                            <td><i class="material-icons change-remove">remove_circle</i></td>
+                            <td>1</td>
+                            <td>ZTP-ZP-005</td>
+                            <td>Standard Zipper</td>
+                            <td>2 pcs</td>
+                            <td>-</td>
+                        </tr>
+                        <tr class="added">
+                            <td><i class="material-icons change-add">add_circle</i></td>
+                            <td>1</td>
+                            <td>ZTP-ZP-008</td>
+                            <td>Premium Zipper - YKK</td>
+                            <td>-</td>
+                            <td>2 pcs</td>
+                        </tr>
+                        <tr class="unchanged">
+                            <td></td>
+                            <td>1</td>
+                            <td>LOGO-EMB-AUTO</td>
+                            <td>Embroidered Logo - Automotive</td>
+                            <td>1 pcs</td>
+                            <td>1 pcs</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header">
+                <div class="card-title">
+                    <i class="material-icons">history</i>
+                    <h3>Version History</h3>
+                </div>
+            </div>
+            <div class="card-content">
+                <div class="history-timeline">
+                    <div class="timeline-line"></div>
+                    
+                    <div class="timeline-item">
+                        <div class="timeline-date">Mar 15, 2025</div>
+                        <div class="timeline-marker"></div>
+                        <div class="timeline-content">
+                            <h4>Version C Released</h4>
+                            <p>Changes:</p>
+                            <ul>
+                                <li>Increased fabric quantity from 2.0 m² to 2.5 m² to improve coverage</li>
+                                <li>Replaced standard zippers with premium YKK zippers for better durability</li>
+                                <li>Updated product description to include airbag compatibility</li>
+                                <li>ECO: ECO-2025-0114</li>
+                            </ul>
+                            <div style="color: #666; font-size: 14px;">Author: J. Anderson | Approved by: M. Johnson</div>
+                        </div>
+                    </div>
+                    
+                    <div class="timeline-item">
+                        <div class="timeline-date">Feb 2, 2025</div>
+                        <div class="timeline-marker"></div>
+                        <div class="timeline-content">
+                            <h4>Version B Released</h4>
+                            <p>Changes:</p>
+                            <ul>
+                                <li>Added memory foam layer to improve comfort</li>
+                                <li>Changed fabric type from standard to water-resistant</li>
+                                <li>Added embroidered logo for branding</li>
+                                <li>ECO: ECO-2025-0092</li>
+                            </ul>
+                            <div style="color: #666; font-size: 14px;">Author: S. Williams | Approved by: M. Johnson</div>
+                        </div>
+                    </div>
+                    
+                    <div class="timeline-item">
+                        <div class="timeline-date">Dec 10, 2024</div>
+                        <div class="timeline-marker"></div>
+                        <div class="timeline-content">
+                            <h4>Version A Released</h4>
+                            <p>Initial release of the Car Seat Cover BOM.</p>
+                            <ul>
+                                <li>Basic seat cover design with standard materials</li>
+                                <li>ECO: ECO-2024-0456</li>
+                            </ul>
+                            <div style="color: #666; font-size: 14px;">Author: S. Williams | Approved by: L. Thompson</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <div class="container">
+            <p>Zervi MRP Application UI Preview - BOM Version Comparison</p>
+            <p><a href="../index.html" style="color: #1976d2; text-decoration: none;">Back to Main Navigation</a></p>
+        </div>
+    </footer>
+</body>
+</html>

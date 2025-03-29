@@ -1,0 +1,565 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Zervi MRP - BOM Costing</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap" />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons" />
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f5f5f5;
+            color: #333;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        header {
+            background-color: #1976d2;
+            color: white;
+            padding: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        h1, h2, h3, h4 {
+            margin-top: 0;
+            font-weight: 400;
+        }
+        .card {
+            background-color: white;
+            border-radius: 4px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            overflow: hidden;
+            margin-bottom: 20px;
+        }
+        .card-header {
+            padding: 16px;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .card-title {
+            display: flex;
+            align-items: center;
+        }
+        .card-title i {
+            margin-right: 8px;
+            color: #1976d2;
+        }
+        .card-content {
+            padding: 16px;
+        }
+        .btn {
+            background-color: transparent;
+            color: #1976d2;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            text-transform: uppercase;
+        }
+        .btn:hover {
+            background-color: rgba(25, 118, 210, 0.1);
+        }
+        .btn-primary {
+            background-color: #1976d2;
+            color: white;
+        }
+        .btn-primary:hover {
+            background-color: #1565c0;
+        }
+        .breadcrumb {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        .breadcrumb a {
+            color: #1976d2;
+            text-decoration: none;
+        }
+        .breadcrumb span {
+            margin: 0 5px;
+        }
+        nav {
+            display: flex;
+            background-color: white;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .nav-item {
+            padding: 15px 20px;
+            color: #666;
+            text-decoration: none;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+        }
+        .nav-item i {
+            margin-right: 5px;
+        }
+        .nav-item.active {
+            color: #1976d2;
+            border-bottom: 2px solid #1976d2;
+        }
+        .nav-item:hover {
+            background-color: #f5f5f5;
+        }
+        footer {
+            margin-top: 40px;
+            padding: 20px;
+            text-align: center;
+            color: #666;
+            font-size: 0.9em;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        thead {
+            background-color: #f5f5f5;
+        }
+        th, td {
+            text-align: left;
+            padding: 12px 15px;
+            border-bottom: 1px solid #eee;
+        }
+        tr:hover {
+            background-color: #f9f9f9;
+        }
+        .info-box {
+            padding: 15px;
+            background-color: #e3f2fd;
+            border-radius: 4px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: flex-start;
+        }
+        .info-box i {
+            margin-right: 10px;
+            color: #1976d2;
+        }
+        .cost-summary {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+        .cost-box {
+            padding: 20px;
+            border-radius: 4px;
+            text-align: center;
+        }
+        .cost-box h3 {
+            margin-bottom: 5px;
+            font-weight: 500;
+        }
+        .cost-box p {
+            margin: 0;
+            font-size: 14px;
+            color: #666;
+        }
+        .cost-box-primary {
+            background-color: #e3f2fd;
+        }
+        .cost-box-secondary {
+            background-color: #f5f5f5;
+        }
+        .cost-box-success {
+            background-color: #e8f5e9;
+        }
+        .cost-value {
+            font-size: 24px;
+            font-weight: 500;
+            margin: 10px 0;
+        }
+        .tabs {
+            display: flex;
+            border-bottom: 1px solid #ddd;
+            margin-bottom: 20px;
+        }
+        .tab {
+            padding: 10px 20px;
+            cursor: pointer;
+            font-weight: 500;
+        }
+        .tab.active {
+            color: #1976d2;
+            border-bottom: 2px solid #1976d2;
+        }
+        .cost-breakdown {
+            display: flex;
+            margin-top: 20px;
+        }
+        .cost-breakdown-chart {
+            flex: 1;
+            height: 300px;
+            background-color: #f5f5f5;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 20px;
+            border-radius: 4px;
+        }
+        .cost-breakdown-details {
+            flex: 1;
+        }
+        .cost-category {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        .cost-category-color {
+            width: 16px;
+            height: 16px;
+            border-radius: 4px;
+            margin-right: 10px;
+        }
+        .historical-chart {
+            height: 250px;
+            background-color: #f5f5f5;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 20px 0;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <h1>Zervi MRP</h1>
+                <div style="display: flex; align-items: center; padding: 8px 16px; border-radius: 20px; background-color: rgba(255, 255, 255, 0.2);">
+                    Automotive Division <i class="material-icons" style="margin-left: 5px; font-size: 18px;">arrow_drop_down</i>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <nav>
+        <div class="container" style="display: flex;">
+            <a href="../dashboard/index.html" class="nav-item"><i class="material-icons">dashboard</i> Dashboard</a>
+            <a href="../inventory/index.html" class="nav-item"><i class="material-icons">inventory_2</i> Inventory</a>
+            <a href="index.html" class="nav-item active"><i class="material-icons">precision_manufacturing</i> Manufacturing</a>
+            <a href="#" class="nav-item"><i class="material-icons">shopping_cart</i> Sales</a>
+            <a href="#" class="nav-item"><i class="material-icons">local_shipping</i> Procurement</a>
+            <a href="../transfers/index.html" class="nav-item"><i class="material-icons">swap_horiz</i> Transfers</a>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="breadcrumb">
+            <a href="../index.html">Home</a>
+            <span>/</span>
+            <a href="index.html">Manufacturing</a>
+            <span>/</span>
+            <a href="bom.html">Bills of Materials</a>
+            <span>/</span>
+            <a href="#">BOM Costing</a>
+        </div>
+
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+            <h2>BOM Costing Analysis</h2>
+            <div>
+                <button class="btn"><i class="material-icons" style="margin-right: 5px;">file_download</i> Export</button>
+                <button class="btn btn-primary"><i class="material-icons" style="margin-right: 5px;">refresh</i> Recalculate</button>
+            </div>
+        </div>
+
+        <div class="info-box">
+            <i class="material-icons">info</i>
+            <div>
+                <p>This page provides detailed cost analysis for Bills of Materials (BOMs). Costs are calculated based on current material prices, labor rates, and overhead allocations. Last updated: March 29, 2025.</p>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header">
+                <div class="card-title">
+                    <i class="material-icons">description</i>
+                    <h3>BOM Selection</h3>
+                </div>
+            </div>
+            <div class="card-content">
+                <div style="display: flex; align-items: center; margin-bottom: 20px;">
+                    <div style="flex: 1; margin-right: 10px;">
+                        <select style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 4px;">
+                            <option selected>Car Seat Cover - Premium (B-2025-0078)</option>
+                            <option>Car Seat Cover - Standard (B-2025-0079)</option>
+                            <option>Luxury Car Mat Set (B-2025-0080)</option>
+                            <option>Dashboard Cover (B-2025-0085)</option>
+                        </select>
+                    </div>
+                    <button class="btn btn-primary">Load</button>
+                </div>
+
+                <div class="tabs">
+                    <div class="tab active">Summary</div>
+                    <div class="tab">Component Costs</div>
+                    <div class="tab">Historical Analysis</div>
+                    <div class="tab">Cost Simulation</div>
+                </div>
+
+                <div class="cost-summary">
+                    <div class="cost-box cost-box-primary">
+                        <h3>Total BOM Cost</h3>
+                        <div class="cost-value">$78.42</div>
+                        <p>Per Unit</p>
+                    </div>
+                    <div class="cost-box cost-box-secondary">
+                        <h3>Labor Cost</h3>
+                        <div class="cost-value">$23.15</div>
+                        <p>29.5% of Total</p>
+                    </div>
+                    <div class="cost-box cost-box-success">
+                        <h3>Material Cost</h3>
+                        <div class="cost-value">$47.85</div>
+                        <p>61.0% of Total</p>
+                    </div>
+                </div>
+
+                <div>
+                    <h4>Cost Distribution</h4>
+                    <div class="cost-breakdown">
+                        <div class="cost-breakdown-chart">
+                            [Cost Distribution Pie Chart]
+                        </div>
+                        <div class="cost-breakdown-details">
+                            <div class="cost-category">
+                                <div class="cost-category-color" style="background-color: #1976d2;"></div>
+                                <div style="flex: 1;">Materials</div>
+                                <div style="font-weight: 500;">$47.85 (61.0%)</div>
+                            </div>
+                            <div class="cost-category">
+                                <div class="cost-category-color" style="background-color: #4caf50;"></div>
+                                <div style="flex: 1;">Direct Labor</div>
+                                <div style="font-weight: 500;">$23.15 (29.5%)</div>
+                            </div>
+                            <div class="cost-category">
+                                <div class="cost-category-color" style="background-color: #ff9800;"></div>
+                                <div style="flex: 1;">Manufacturing Overhead</div>
+                                <div style="font-weight: 500;">$5.64 (7.2%)</div>
+                            </div>
+                            <div class="cost-category">
+                                <div class="cost-category-color" style="background-color: #9c27b0;"></div>
+                                <div style="flex: 1;">Quality Testing</div>
+                                <div style="font-weight: 500;">$1.78 (2.3%)</div>
+                            </div>
+                            <div style="margin-top: 15px; padding-top: 15px; border-top: 1px solid #eee;">
+                                <div style="display: flex; justify-content: space-between; font-weight: 500;">
+                                    <div>Total Cost Per Unit:</div>
+                                    <div>$78.42 (100%)</div>
+                                </div>
+                                <div style="display: flex; justify-content: space-between; margin-top: 10px;">
+                                    <div>Suggested Markup (35%):</div>
+                                    <div>$27.45</div>
+                                </div>
+                                <div style="display: flex; justify-content: space-between; margin-top: 10px; font-weight: 500; color: #1976d2;">
+                                    <div>Suggested Selling Price:</div>
+                                    <div>$105.87</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header">
+                <div class="card-title">
+                    <i class="material-icons">list</i>
+                    <h3>Component Cost Breakdown</h3>
+                </div>
+            </div>
+            <div class="card-content">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Level</th>
+                            <th>Item Number</th>
+                            <th>Description</th>
+                            <th>Quantity</th>
+                            <th>Unit</th>
+                            <th>Unit Cost</th>
+                            <th>Line Cost</th>
+                            <th>% of Total</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>1</td>
+                            <td>FAB-PRM-001</td>
+                            <td>Waterproof Fabric - Premium</td>
+                            <td>2.5</td>
+                            <td>m²</td>
+                            <td>$8.45</td>
+                            <td>$21.13</td>
+                            <td>26.9%</td>
+                        </tr>
+                        <tr>
+                            <td>1</td>
+                            <td>FOAM-AUTO-002</td>
+                            <td>Memory Foam - 10mm</td>
+                            <td>1.8</td>
+                            <td>m²</td>
+                            <td>$7.20</td>
+                            <td>$12.96</td>
+                            <td>16.5%</td>
+                        </tr>
+                        <tr>
+                            <td>1</td>
+                            <td>ASSY-BACK-001</td>
+                            <td>Seat Back Assembly</td>
+                            <td>1</td>
+                            <td>pcs</td>
+                            <td>$24.65</td>
+                            <td>$24.65</td>
+                            <td>31.4%</td>
+                        </tr>
+                        <tr style="background-color: #f5f5f5;">
+                            <td>2</td>
+                            <td>FAB-BKG-001</td>
+                            <td>Backing Fabric - Non-slip</td>
+                            <td>1.2</td>
+                            <td>m²</td>
+                            <td>$5.35</td>
+                            <td>$6.42</td>
+                            <td>--</td>
+                        </tr>
+                        <tr style="background-color: #f5f5f5;">
+                            <td>2</td>
+                            <td>ZTP-VR-012</td>
+                            <td>Velcro Strip - 2.5cm</td>
+                            <td>4</td>
+                            <td>m</td>
+                            <td>$0.85</td>
+                            <td>$3.40</td>
+                            <td>--</td>
+                        </tr>
+                        <tr>
+                            <td>1</td>
+                            <td>ZTP-ZP-008</td>
+                            <td>Premium Zipper - YKK</td>
+                            <td>2</td>
+                            <td>pcs</td>
+                            <td>$3.25</td>
+                            <td>$6.50</td>
+                            <td>8.3%</td>
+                        </tr>
+                        <tr>
+                            <td>1</td>
+                            <td>LOGO-EMB-AUTO</td>
+                            <td>Embroidered Logo - Automotive</td>
+                            <td>1</td>
+                            <td>pcs</td>
+                            <td>$4.40</td>
+                            <td>$4.40</td>
+                            <td>5.6%</td>
+                        </tr>
+                        <tr style="background-color: #e3f2fd; font-weight: 500;">
+                            <td colspan="6">Total Material Cost</td>
+                            <td>$47.85</td>
+                            <td>61.0%</td>
+                        </tr>
+                        <tr style="background-color: #e8f5e9;">
+                            <td colspan="6">Labor Cost (Cutting, Sewing, Assembly, Quality Inspection)</td>
+                            <td>$23.15</td>
+                            <td>29.5%</td>
+                        </tr>
+                        <tr style="background-color: #fff3e0;">
+                            <td colspan="6">Manufacturing Overhead</td>
+                            <td>$5.64</td>
+                            <td>7.2%</td>
+                        </tr>
+                        <tr style="background-color: #f3e5f5;">
+                            <td colspan="6">Quality Testing</td>
+                            <td>$1.78</td>
+                            <td>2.3%</td>
+                        </tr>
+                        <tr style="font-weight: 500; background-color: #f5f5f5;">
+                            <td colspan="6">Total BOM Cost Per Unit</td>
+                            <td>$78.42</td>
+                            <td>100%</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header">
+                <div class="card-title">
+                    <i class="material-icons">trending_up</i>
+                    <h3>Cost Trend Analysis</h3>
+                </div>
+            </div>
+            <div class="card-content">
+                <h4>Historical Cost Changes (Last 6 Months)</h4>
+                <div class="historical-chart">
+                    [Cost Trend Line Chart]
+                </div>
+
+                <div style="margin-top: 20px;">
+                    <h4>Cost Impact Factors</h4>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Factor</th>
+                                <th>Change</th>
+                                <th>Impact</th>
+                                <th>Date</th>
+                                <th>Notes</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Raw Material Price - Fabrics</td>
+                                <td style="color: #f44336;">+8.5%</td>
+                                <td style="color: #f44336;">+$1.79</td>
+                                <td>Feb 12, 2025</td>
+                                <td>Global supply chain constraints</td>
+                            </tr>
+                            <tr>
+                                <td>Labor Rate Adjustment</td>
+                                <td style="color: #f44336;">+3.2%</td>
+                                <td style="color: #f44336;">+$0.72</td>
+                                <td>Jan 1, 2025</td>
+                                <td>Annual wage adjustment</td>
+                            </tr>
+                            <tr>
+                                <td>Process Optimization - Cutting</td>
+                                <td style="color: #4caf50;">-5.1%</td>
+                                <td style="color: #4caf50;">-$0.65</td>
+                                <td>Mar 5, 2025</td>
+                                <td>New pattern layout algorithm</td>
+                            </tr>
+                            <tr>
+                                <td>Alternative Supplier - Zippers</td>
+                                <td style="color: #4caf50;">-12.4%</td>
+                                <td style="color: #4caf50;">-$0.91</td>
+                                <td>Mar 15, 2025</td>
+                                <td>New supplier for premium zippers</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <div class="container">
+            <p>Zervi MRP Application UI Preview - BOM Costing</p>
+            <p><a href="../index.html" style="color: #1976d2; text-decoration: none;">Back to Main Navigation</a></p>
+        </div>
+    </footer>
+</body>
+</html>
