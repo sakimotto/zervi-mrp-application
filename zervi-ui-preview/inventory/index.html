@@ -1,0 +1,752 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Zervi MRP - Inventory</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap" />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons" />
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f5f5f5;
+            color: #333;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        header {
+            background-color: #1976d2;
+            color: white;
+            padding: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        h1, h2, h3, h4 {
+            margin-top: 0;
+            font-weight: 400;
+        }
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            margin-top: 20px;
+        }
+        @media (max-width: 900px) {
+            .grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+        @media (max-width: 600px) {
+            .grid {
+                grid-template-columns: 1fr;
+            }
+        }
+        .card {
+            background-color: white;
+            border-radius: 4px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        .card-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 16px;
+            border-bottom: 1px solid #eee;
+        }
+        .card-title {
+            display: flex;
+            align-items: center;
+        }
+        .card-title i {
+            margin-right: 8px;
+            color: #1976d2;
+        }
+        .card-content {
+            padding: 16px;
+        }
+        .card-action {
+            padding: 8px 16px;
+            text-align: right;
+        }
+        .btn {
+            background-color: transparent;
+            color: #1976d2;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            text-transform: uppercase;
+        }
+        .btn:hover {
+            background-color: rgba(25, 118, 210, 0.1);
+        }
+        .btn-primary {
+            background-color: #1976d2;
+            color: white;
+        }
+        .btn-primary:hover {
+            background-color: #1565c0;
+        }
+        .divider {
+            height: 1px;
+            background-color: #eee;
+            margin: 10px 0;
+        }
+        .breadcrumb {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        .breadcrumb a {
+            color: #1976d2;
+            text-decoration: none;
+        }
+        .breadcrumb span {
+            margin: 0 5px;
+        }
+        .active-division {
+            display: flex;
+            align-items: center;
+            padding: 8px 16px;
+            border-radius: 20px;
+            background-color: rgba(255, 255, 255, 0.2);
+            margin-left: 15px;
+        }
+        .active-division i {
+            margin-left: 5px;
+            font-size: 18px;
+        }
+        nav {
+            display: flex;
+            background-color: white;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .nav-item {
+            padding: 15px 20px;
+            color: #666;
+            text-decoration: none;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+        }
+        .nav-item i {
+            margin-right: 5px;
+        }
+        .nav-item.active {
+            color: #1976d2;
+            border-bottom: 2px solid #1976d2;
+        }
+        .nav-item:hover {
+            background-color: #f5f5f5;
+        }
+        footer {
+            margin-top: 40px;
+            padding: 20px;
+            text-align: center;
+            color: #666;
+            font-size: 0.9em;
+        }
+        .tab-bar {
+            display: flex;
+            background-color: white;
+            border-radius: 4px;
+            overflow: hidden;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        .tab {
+            padding: 15px 25px;
+            cursor: pointer;
+            font-weight: 500;
+        }
+        .tab.active {
+            background-color: #1976d2;
+            color: white;
+        }
+        .tab:hover:not(.active) {
+            background-color: #f5f5f5;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        thead {
+            background-color: #f5f5f5;
+        }
+        th, td {
+            text-align: left;
+            padding: 12px 15px;
+            border-bottom: 1px solid #eee;
+        }
+        tr:hover {
+            background-color: #f9f9f9;
+        }
+        .stock-level {
+            display: inline-block;
+            width: 80px;
+            height: 8px;
+            background-color: #eee;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+        .stock-fill {
+            height: 100%;
+            background-color: #4caf50;
+        }
+        .low-stock {
+            background-color: #ff9800;
+        }
+        .out-of-stock {
+            background-color: #f44336;
+        }
+        .search-bar {
+            display: flex;
+            margin-bottom: 20px;
+        }
+        .search-input {
+            flex: 1;
+            padding: 10px 15px;
+            border: 1px solid #ddd;
+            border-radius: 4px 0 0 4px;
+            font-size: 16px;
+        }
+        .search-button {
+            background-color: #1976d2;
+            color: white;
+            border: none;
+            padding: 0 20px;
+            border-radius: 0 4px 4px 0;
+            cursor: pointer;
+        }
+        .filter-bar {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        .filter-chip {
+            background-color: #e3f2fd;
+            color: #1976d2;
+            padding: 5px 12px;
+            border-radius: 16px;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+        }
+        .filter-chip i {
+            font-size: 16px;
+            margin-left: 5px;
+        }
+        .warehouse-selector {
+            margin-bottom: 20px;
+            padding: 15px;
+            background-color: white;
+            border-radius: 4px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .warehouse-title {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        .warehouse-title i {
+            margin-right: 8px;
+            color: #1976d2;
+        }
+        .warehouse-options {
+            display: flex;
+            overflow-x: auto;
+            gap: 10px;
+            padding-bottom: 10px;
+        }
+        .warehouse-option {
+            padding: 8px 16px;
+            background-color: #f5f5f5;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .warehouse-option.active {
+            background-color: #1976d2;
+            color: white;
+        }
+        .chart-container {
+            height: 250px;
+            background-color: #f9f9f9;
+            border-radius: 4px;
+            position: relative;
+            margin-top: 20px;
+        }
+        .chart-container::after {
+            content: "Inventory trend visualization would appear here";
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: #999;
+        }
+        .category-tree {
+            max-height: 400px;
+            overflow-y: auto;
+            border: 1px solid #eee;
+            border-radius: 4px;
+            padding: 10px;
+        }
+        .tree-item {
+            padding: 8px 10px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+        }
+        .tree-item:hover {
+            background-color: #f5f5f5;
+        }
+        .tree-item i {
+            margin-right: 8px;
+            font-size: 18px;
+            color: #1976d2;
+        }
+        .tree-item.active {
+            background-color: #e3f2fd;
+        }
+        .inventory-movement {
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        .movement-item {
+            padding: 10px;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            align-items: center;
+        }
+        .movement-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 20px;
+            background-color: #e3f2fd;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 15px;
+        }
+        .movement-icon i {
+            color: #1976d2;
+        }
+        .movement-in i {
+            color: #4caf50;
+        }
+        .movement-out i {
+            color: #f44336;
+        }
+        .movement-content {
+            flex: 1;
+        }
+        .movement-time {
+            color: #999;
+            font-size: 12px;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <h1>Zervi MRP</h1>
+                <div class="active-division">
+                    Automotive Division <i class="material-icons">arrow_drop_down</i>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <nav>
+        <div class="container" style="display: flex;">
+            <a href="../dashboard/index.html" class="nav-item"><i class="material-icons">dashboard</i> Dashboard</a>
+            <a href="#" class="nav-item active"><i class="material-icons">inventory_2</i> Inventory</a>
+            <a href="../manufacturing/index.html" class="nav-item"><i class="material-icons">precision_manufacturing</i> Manufacturing</a>
+            <a href="#" class="nav-item"><i class="material-icons">shopping_cart</i> Sales</a>
+            <a href="#" class="nav-item"><i class="material-icons">local_shipping</i> Procurement</a>
+            <a href="../transfers/index.html" class="nav-item"><i class="material-icons">swap_horiz</i> Transfers</a>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="breadcrumb">
+            <a href="../index.html">Home</a>
+            <span>/</span>
+            <a href="#">Inventory</a>
+        </div>
+
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+            <h2>Inventory Management</h2>
+            <div>
+                <button class="btn"><i class="material-icons" style="margin-right: 5px;">file_download</i> Export</button>
+                <button class="btn btn-primary"><i class="material-icons" style="margin-right: 5px;">add</i> Add Item</button>
+            </div>
+        </div>
+
+        <div class="tab-bar">
+            <div class="tab active">Stock Overview</div>
+            <div class="tab">Items</div>
+            <div class="tab">Stock Movements</div>
+            <div class="tab">Warehouses</div>
+            <div class="tab">Categories</div>
+        </div>
+
+        <div class="warehouse-selector">
+            <div class="warehouse-title">
+                <i class="material-icons">home_work</i>
+                <h3>Warehouse Selection</h3>
+            </div>
+            <div class="warehouse-options">
+                <div class="warehouse-option active">All Warehouses</div>
+                <div class="warehouse-option">Main Warehouse</div>
+                <div class="warehouse-option">Production Floor</div>
+                <div class="warehouse-option">Finished Goods</div>
+                <div class="warehouse-option">Raw Materials</div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header">
+                <div class="card-title">
+                    <i class="material-icons">inventory</i>
+                    <h3>Stock Overview</h3>
+                </div>
+            </div>
+            <div class="card-content">
+                <div class="search-bar">
+                    <input type="text" class="search-input" placeholder="Search inventory items...">
+                    <button class="search-button"><i class="material-icons">search</i></button>
+                </div>
+
+                <div class="filter-bar">
+                    <div class="filter-chip">Category: All <i class="material-icons">arrow_drop_down</i></div>
+                    <div class="filter-chip">Type: All <i class="material-icons">arrow_drop_down</i></div>
+                    <div class="filter-chip">Stock Level: All <i class="material-icons">arrow_drop_down</i></div>
+                    <div class="filter-chip">Location: All <i class="material-icons">arrow_drop_down</i></div>
+                </div>
+
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Item Code</th>
+                            <th>Name</th>
+                            <th>Category</th>
+                            <th>Stock Level</th>
+                            <th>Available</th>
+                            <th>Reserved</th>
+                            <th>Reorder Point</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>RM-123-456</td>
+                            <td>Technical Textile - Grade A</td>
+                            <td>Raw Materials</td>
+                            <td>
+                                <div style="display: flex; align-items: center;">
+                                    <div class="stock-level">
+                                        <div class="stock-fill" style="width: 70%;"></div>
+                                    </div>
+                                    <span style="margin-left: 10px;">350 m²</span>
+                                </div>
+                            </td>
+                            <td>350 m²</td>
+                            <td>0 m²</td>
+                            <td>100 m²</td>
+                            <td>
+                                <button class="btn">View</button>
+                                <button class="btn">Adjust</button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>RM-123-457</td>
+                            <td>Technical Textile - Grade B</td>
+                            <td>Raw Materials</td>
+                            <td>
+                                <div style="display: flex; align-items: center;">
+                                    <div class="stock-level">
+                                        <div class="stock-fill low-stock" style="width: 25%;"></div>
+                                    </div>
+                                    <span style="margin-left: 10px;">50 m²</span>
+                                </div>
+                            </td>
+                            <td>40 m²</td>
+                            <td>10 m²</td>
+                            <td>80 m²</td>
+                            <td>
+                                <button class="btn">View</button>
+                                <button class="btn">Adjust</button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>RM-234-567</td>
+                            <td>Polyester Thread - Black</td>
+                            <td>Raw Materials</td>
+                            <td>
+                                <div style="display: flex; align-items: center;">
+                                    <div class="stock-level">
+                                        <div class="stock-fill out-of-stock" style="width: 0%;"></div>
+                                    </div>
+                                    <span style="margin-left: 10px;">0 spools</span>
+                                </div>
+                            </td>
+                            <td>0 spools</td>
+                            <td>0 spools</td>
+                            <td>10 spools</td>
+                            <td>
+                                <button class="btn">View</button>
+                                <button class="btn">Adjust</button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>SF-345-678</td>
+                            <td>Car Seat Base - Cut Panels</td>
+                            <td>Semi-Finished</td>
+                            <td>
+                                <div style="display: flex; align-items: center;">
+                                    <div class="stock-level">
+                                        <div class="stock-fill" style="width: 90%;"></div>
+                                    </div>
+                                    <span style="margin-left: 10px;">180 sets</span>
+                                </div>
+                            </td>
+                            <td>130 sets</td>
+                            <td>50 sets</td>
+                            <td>40 sets</td>
+                            <td>
+                                <button class="btn">View</button>
+                                <button class="btn">Adjust</button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>SF-456-789</td>
+                            <td>Dashboard Cover - Laminated</td>
+                            <td>Semi-Finished</td>
+                            <td>
+                                <div style="display: flex; align-items: center;">
+                                    <div class="stock-level">
+                                        <div class="stock-fill" style="width: 60%;"></div>
+                                    </div>
+                                    <span style="margin-left: 10px;">120 units</span>
+                                </div>
+                            </td>
+                            <td>90 units</td>
+                            <td>30 units</td>
+                            <td>50 units</td>
+                            <td>
+                                <button class="btn">View</button>
+                                <button class="btn">Adjust</button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>FG-567-890</td>
+                            <td>Car Seat Cover - Model A</td>
+                            <td>Finished Goods</td>
+                            <td>
+                                <div style="display: flex; align-items: center;">
+                                    <div class="stock-level">
+                                        <div class="stock-fill low-stock" style="width: 30%;"></div>
+                                    </div>
+                                    <span style="margin-left: 10px;">15 units</span>
+                                </div>
+                            </td>
+                            <td>5 units</td>
+                            <td>10 units</td>
+                            <td>20 units</td>
+                            <td>
+                                <button class="btn">View</button>
+                                <button class="btn">Adjust</button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>FG-678-901</td>
+                            <td>Floor Mat - Standard</td>
+                            <td>Finished Goods</td>
+                            <td>
+                                <div style="display: flex; align-items: center;">
+                                    <div class="stock-level">
+                                        <div class="stock-fill" style="width: 85%;"></div>
+                                    </div>
+                                    <span style="margin-left: 10px;">85 sets</span>
+                                </div>
+                            </td>
+                            <td>65 sets</td>
+                            <td>20 sets</td>
+                            <td>25 sets</td>
+                            <td>
+                                <button class="btn">View</button>
+                                <button class="btn">Adjust</button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <div style="display: flex; justify-content: flex-end; margin-top: 20px; align-items: center;">
+                    <span style="margin-right: 20px;">Showing 1-7 of 1,248 items</span>
+                    <button class="btn" disabled>Previous</button>
+                    <button class="btn">Next</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="grid" style="grid-template-columns: repeat(2, 1fr); margin-top: 20px;">
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title">
+                        <i class="material-icons">category</i>
+                        <h3>Categories</h3>
+                    </div>
+                </div>
+                <div class="card-content">
+                    <div class="category-tree">
+                        <div class="tree-item active">
+                            <i class="material-icons">folder</i>
+                            <span>All Categories</span>
+                        </div>
+                        <div class="tree-item" style="padding-left: 25px;">
+                            <i class="material-icons">folder</i>
+                            <span>Raw Materials</span>
+                        </div>
+                        <div class="tree-item" style="padding-left: 40px;">
+                            <i class="material-icons">folder</i>
+                            <span>Technical Textiles</span>
+                        </div>
+                        <div class="tree-item" style="padding-left: 40px;">
+                            <i class="material-icons">folder</i>
+                            <span>Threads</span>
+                        </div>
+                        <div class="tree-item" style="padding-left: 40px;">
+                            <i class="material-icons">folder</i>
+                            <span>Foams</span>
+                        </div>
+                        <div class="tree-item" style="padding-left: 25px;">
+                            <i class="material-icons">folder</i>
+                            <span>Semi-Finished</span>
+                        </div>
+                        <div class="tree-item" style="padding-left: 40px;">
+                            <i class="material-icons">folder</i>
+                            <span>Cut Panels</span>
+                        </div>
+                        <div class="tree-item" style="padding-left: 40px;">
+                            <i class="material-icons">folder</i>
+                            <span>Laminated Panels</span>
+                        </div>
+                        <div class="tree-item" style="padding-left: 25px;">
+                            <i class="material-icons">folder</i>
+                            <span>Finished Goods</span>
+                        </div>
+                        <div class="tree-item" style="padding-left: 40px;">
+                            <i class="material-icons">folder</i>
+                            <span>Seat Covers</span>
+                        </div>
+                        <div class="tree-item" style="padding-left: 40px;">
+                            <i class="material-icons">folder</i>
+                            <span>Floor Mats</span>
+                        </div>
+                        <div class="tree-item" style="padding-left: 40px;">
+                            <i class="material-icons">folder</i>
+                            <span>Dashboard Covers</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title">
+                        <i class="material-icons">swap_horiz</i>
+                        <h3>Recent Stock Movements</h3>
+                    </div>
+                </div>
+                <div class="card-content">
+                    <div class="inventory-movement">
+                        <div class="movement-item">
+                            <div class="movement-icon movement-in">
+                                <i class="material-icons">arrow_downward</i>
+                            </div>
+                            <div class="movement-content">
+                                <div>Received 200 m² Technical Textile - Grade A</div>
+                                <div class="movement-time">Today, 08:15 AM</div>
+                            </div>
+                        </div>
+                        <div class="movement-item">
+                            <div class="movement-icon movement-out">
+                                <i class="material-icons">arrow_upward</i>
+                            </div>
+                            <div class="movement-content">
+                                <div>Issued 50 units Dashboard Cover - Laminated to Manufacturing</div>
+                                <div class="movement-time">Today, 07:45 AM</div>
+                            </div>
+                        </div>
+                        <div class="movement-item">
+                            <div class="movement-icon movement-in">
+                                <i class="material-icons">swap_horiz</i>
+                            </div>
+                            <div class="movement-content">
+                                <div>Transfer received from Zervitek Division: 100 m² Technical Textile - Grade B</div>
+                                <div class="movement-time">Yesterday, 04:30 PM</div>
+                            </div>
+                        </div>
+                        <div class="movement-item">
+                            <div class="movement-icon movement-out">
+                                <i class="material-icons">arrow_upward</i>
+                            </div>
+                            <div class="movement-content">
+                                <div>Issued 35 sets Car Seat Base - Cut Panels to Manufacturing</div>
+                                <div class="movement-time">Yesterday, 02:15 PM</div>
+                            </div>
+                        </div>
+                        <div class="movement-item">
+                            <div class="movement-icon movement-in">
+                                <i class="material-icons">arrow_downward</i>
+                            </div>
+                            <div class="movement-content">
+                                <div>Manufacturing completion: 40 units Car Seat Cover - Model A</div>
+                                <div class="movement-time">Yesterday, 11:20 AM</div>
+                            </div>
+                        </div>
+                        <div class="movement-item">
+                            <div class="movement-icon movement-out">
+                                <i class="material-icons">arrow_upward</i>
+                            </div>
+                            <div class="movement-content">
+                                <div>Customer shipment: 25 units Floor Mat - Standard</div>
+                                <div class="movement-time">Mar 28, 2025, 03:45 PM</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card" style="margin-top: 20px;">
+            <div class="card-header">
+                <div class="card-title">
+                    <i class="material-icons">trending_up</i>
+                    <h3>Inventory Trends</h3>
+                </div>
+            </div>
+            <div class="card-content">
+                <div class="chart-container"></div>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <div class="container">
+            <p>Zervi MRP Application UI Preview - Inventory</p>
+            <p><a href="../index.html" style="color: #1976d2; text-decoration: none;">Back to Main Navigation</a></p>
+        </div>
+    </footer>
+</body>
+</html>

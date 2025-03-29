@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Zervi MRP - Inter-Division Transfers</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap" />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons" />
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f5f5f5;
+            color: #333;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        header {
+            background-color: #1976d2;
+            color: white;
+            padding: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        h1, h2, h3, h4 {
+            margin-top: 0;
+            font-weight: 400;
+        }
+        .card {
+            background-color: white;
+            border-radius: 4px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            overflow: hidden;
+            margin-bottom: 20px;
+        }
+        .card-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 16px;
+            border-bottom: 1px solid #eee;
+        }
+        .card-title {
+            display: flex;
+            align-items: center;
+        }
+        .card-title i {
+            margin-right: 8px;
+            color: #1976d2;
+        }
+        .card-content {
+            padding: 16px;
+        }
+        .btn {
+            background-color: transparent;
+            color: #1976d2;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            text-transform: uppercase;
+        }
+        .btn:hover {
+            background-color: rgba(25, 118, 210, 0.1);
+        }
+        .btn-primary {
+            background-color: #1976d2;
+            color: white;
+        }
+        .btn-primary:hover {
+            background-color: #1565c0;
+        }
+        .breadcrumb {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        .breadcrumb a {
+            color: #1976d2;
+            text-decoration: none;
+        }
+        .breadcrumb span {
+            margin: 0 5px;
+        }
+        nav {
+            display: flex;
+            background-color: white;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .nav-item {
+            padding: 15px 20px;
+            color: #666;
+            text-decoration: none;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+        }
+        .nav-item i {
+            margin-right: 5px;
+        }
+        .nav-item.active {
+            color: #1976d2;
+            border-bottom: 2px solid #1976d2;
+        }
+        .nav-item:hover {
+            background-color: #f5f5f5;
+        }
+        footer {
+            margin-top: 40px;
+            padding: 20px;
+            text-align: center;
+            color: #666;
+            font-size: 0.9em;
+        }
+        .tab-bar {
+            display: flex;
+            background-color: white;
+            border-radius: 4px;
+            overflow: hidden;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        .tab {
+            padding: 15px 25px;
+            cursor: pointer;
+            font-weight: 500;
+        }
+        .tab.active {
+            background-color: #1976d2;
+            color: white;
+        }
+        .tab:hover:not(.active) {
+            background-color: #f5f5f5;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        thead {
+            background-color: #f5f5f5;
+        }
+        th, td {
+            text-align: left;
+            padding: 12px 15px;
+            border-bottom: 1px solid #eee;
+        }
+        tr:hover {
+            background-color: #f9f9f9;
+        }
+        .status-chip {
+            display: inline-block;
+            padding: 5px 12px;
+            border-radius: 16px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+        .status-pending {
+            background-color: #fff8e1;
+            color: #ff9800;
+        }
+        .status-in-transit {
+            background-color: #e3f2fd;
+            color: #1976d2;
+        }
+        .status-received {
+            background-color: #e8f5e9;
+            color: #4caf50;
+        }
+        .status-rejected {
+            background-color: #ffebee;
+            color: #f44336;
+        }
+        .search-bar {
+            display: flex;
+            margin-bottom: 20px;
+        }
+        .search-input {
+            flex: 1;
+            padding: 10px 15px;
+            border: 1px solid #ddd;
+            border-radius: 4px 0 0 4px;
+            font-size: 16px;
+        }
+        .search-button {
+            background-color: #1976d2;
+            color: white;
+            border: none;
+            padding: 0 20px;
+            border-radius: 0 4px 4px 0;
+            cursor: pointer;
+        }
+        .filter-bar {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        .filter-chip {
+            background-color: #e3f2fd;
+            color: #1976d2;
+            padding: 5px 12px;
+            border-radius: 16px;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+        }
+        .filter-chip i {
+            font-size: 16px;
+            margin-left: 5px;
+        }
+        .division-selector {
+            display: flex;
+            margin-bottom: 20px;
+            background-color: white;
+            border-radius: 4px;
+            overflow: hidden;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .division-selector-item {
+            padding: 15px 20px;
+            cursor: pointer;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            border-right: 1px solid #eee;
+        }
+        .division-selector-item:last-child {
+            border-right: none;
+        }
+        .division-selector-item i {
+            margin-right: 8px;
+            color: #1976d2;
+        }
+        .division-selector-item.active {
+            background-color: #1976d2;
+            color: white;
+        }
+        .division-selector-item.active i {
+            color: white;
+        }
+        .division-selector-item:hover:not(.active) {
+            background-color: #f5f5f5;
+        }
+        .transfer-flow {
+            height: 200px;
+            background-color: #f9f9f9;
+            border-radius: 4px;
+            position: relative;
+            margin: 20px 0;
+        }
+        .transfer-flow::after {
+            content: "Transfer flow visualization would appear here";
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: #999;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <h1>Zervi MRP</h1>
+            </div>
+        </div>
+    </header>
+
+    <nav>
+        <div class="container" style="display: flex;">
+            <a href="../dashboard/index.html" class="nav-item"><i class="material-icons">dashboard</i> Dashboard</a>
+            <a href="../inventory/index.html" class="nav-item"><i class="material-icons">inventory_2</i> Inventory</a>
+            <a href="../manufacturing/index.html" class="nav-item"><i class="material-icons">precision_manufacturing</i> Manufacturing</a>
+            <a href="#" class="nav-item"><i class="material-icons">shopping_cart</i> Sales</a>
+            <a href="#" class="nav-item"><i class="material-icons">local_shipping</i> Procurement</a>
+            <a href="#" class="nav-item active"><i class="material-icons">swap_horiz</i> Transfers</a>
+            <a href="../divisions/index.html" class="nav-item"><i class="material-icons">business</i> Divisions</a>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="breadcrumb">
+            <a href="../index.html">Home</a>
+            <span>/</span>
+            <a href="#">Inter-Division Transfers</a>
+        </div>
+
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+            <h2>Inter-Division Transfers</h2>
+            <button class="btn btn-primary"><i class="material-icons" style="margin-right: 5px;">add</i> New Transfer</button>
+        </div>
+
+        <p>The inter-division transfer system allows for the movement of materials, semi-finished goods, and products between Zervi's divisions, supporting the company's vertical integration strategy.</p>
+
+        <div class="tab-bar">
+            <div class="tab active">All Transfers</div>
+            <div class="tab">Incoming</div>
+            <div class="tab">Outgoing</div>
+            <div class="tab">Transfer History</div>
+        </div>
+
+        <div class="card">
+            <div class="card-header">
+                <div class="card-title">
+                    <i class="material-icons">swap_horiz</i>
+                    <h3>Active Transfers</h3>
+                </div>
+            </div>
+            <div class="card-content">
+                <div class="search-bar">
+                    <input type="text" class="search-input" placeholder="Search transfers...">
+                    <button class="search-button"><i class="material-icons">search</i></button>
+                </div>
+
+                <div class="filter-bar">
+                    <div class="filter-chip">Status: All <i class="material-icons">arrow_drop_down</i></div>
+                    <div class="filter-chip">Date Range: Last 30 Days <i class="material-icons">arrow_drop_down</i></div>
+                    <div class="filter-chip">Source: All <i class="material-icons">arrow_drop_down</i></div>
+                    <div class="filter-chip">Destination: All <i class="material-icons">arrow_drop_down</i></div>
+                </div>
+
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Transfer #</th>
+                            <th>Source Division</th>
+                            <th>Destination Division</th>
+                            <th>Materials</th>
+                            <th>Request Date</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>TRF-2025-0128</td>
+                            <td>Zervitek</td>
+                            <td>Automotive</td>
+                            <td>Technical Textile - Grade A (150 m²)</td>
+                            <td>Mar 28, 2025</td>
+                            <td><span class="status-chip status-in-transit">In Transit</span></td>
+                            <td>
+                                <button class="btn">View</button>
+                                <button class="btn">Track</button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>TRF-2025-0127</td>
+                            <td>Zervitek</td>
+                            <td>Camping</td>
+                            <td>Waterproof Membrane (200 m²)</td>
+                            <td>Mar 28, 2025</td>
+                            <td><span class="status-chip status-pending">Pending</span></td>
+                            <td>
+                                <button class="btn">View</button>
+                                <button class="btn">Cancel</button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>TRF-2025-0126</td>
+                            <td>Zervitek</td>
+                            <td>Apparel</td>
+                            <td>Fire-Resistant Fabric (75 m²)</td>
+                            <td>Mar 27, 2025</td>
+                            <td><span class="status-chip status-received">Received</span></td>
+                            <td>
+                                <button class="btn">View</button>
+                                <button class="btn">Close</button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>TRF-2025-0125</td>
+                            <td>Automotive</td>
+                            <td>Camping</td>
+                            <td>Excess Foam Padding (120 units)</td>
+                            <td>Mar 26, 2025</td>
+                            <td><span class="status-chip status-in-transit">In Transit</span></td>
+                            <td>
+                                <button class="btn">View</button>
+                                <button class="btn">Track</button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>TRF-2025-0124</td>
+                            <td>Zervitek</td>
+                            <td>Automotive</td>
+                            <td>Technical Textile - Grade B (100 m²)</td>
+                            <td>Mar 26, 2025</td>
+                            <td><span class="status-chip status-received">Received</span></td>
+                            <td>
+                                <button class="btn">View</button>
+                                <button class="btn">Close</button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>TRF-2025-0123</td>
+                            <td>Apparel</td>
+                            <td>Camping</td>
+                            <td>Excess Thread Spools (25 units)</td>
+                            <td>Mar 25, 2025</td>
+                            <td><span class="status-chip status-rejected">Rejected</span></td>
+                            <td>
+                                <button class="btn">View</button>
+                                <button class="btn">Resubmit</button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <div style="display: flex; justify-content: flex-end; margin-top: 20px; align-items: center;">
+                    <span style="margin-right: 20px;">Showing 1-6 of 15 transfers</span>
+                    <button class="btn" disabled>Previous</button>
+                    <button class="btn">Next</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header">
+                <div class="card-title">
+                    <i class="material-icons">insights</i>
+                    <h3>Material Flow Between Divisions</h3>
+                </div>
+            </div>
+            <div class="card-content">
+                <p>This diagram illustrates the flow of materials between Zervi divisions over the past 30 days, with Zervitek being the primary supplier of technical textiles to other divisions.</p>
+                <div class="transfer-flow"></div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header">
+                <div class="card-title">
+                    <i class="material-icons">assessment</i>
+                    <h3>Transfer Analytics</h3>
+                </div>
+            </div>
+            <div class="card-content">
+                <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px;">
+                    <div style="text-align: center; padding: 15px; background-color: #f5f5f5; border-radius: 4px;">
+                        <h3 style="margin: 0; font-size: 24px;">15</h3>
+                        <p style="margin: 5px 0 0;">Active Transfers</p>
+                    </div>
+                    <div style="text-align: center; padding: 15px; background-color: #f5f5f5; border-radius: 4px;">
+                        <h3 style="margin: 0; font-size: 24px;">92%</h3>
+                        <p style="margin: 5px 0 0;">On-Time Delivery</p>
+                    </div>
+                    <div style="text-align: center; padding: 15px; background-color: #f5f5f5; border-radius: 4px;">
+                        <h3 style="margin: 0; font-size: 24px;">1.8 days</h3>
+                        <p style="margin: 5px 0 0;">Avg. Transit Time</p>
+                    </div>
+                    <div style="text-align: center; padding: 15px; background-color: #f5f5f5; border-radius: 4px;">
+                        <h3 style="margin: 0; font-size: 24px;">95%</h3>
+                        <p style="margin: 5px 0 0;">Quality Pass Rate</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <div class="container">
+            <p>Zervi MRP Application UI Preview - Inter-Division Transfers</p>
+            <p><a href="../index.html" style="color: #1976d2; text-decoration: none;">Back to Main Navigation</a></p>
+        </div>
+    </footer>
+</body>
+</html>

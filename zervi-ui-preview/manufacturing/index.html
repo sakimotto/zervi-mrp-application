@@ -1,0 +1,507 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Zervi MRP - Manufacturing</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap" />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons" />
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f5f5f5;
+            color: #333;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        header {
+            background-color: #1976d2;
+            color: white;
+            padding: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        h1, h2, h3, h4 {
+            margin-top: 0;
+            font-weight: 400;
+        }
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            margin-top: 20px;
+        }
+        @media (max-width: 900px) {
+            .grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+        @media (max-width: 600px) {
+            .grid {
+                grid-template-columns: 1fr;
+            }
+        }
+        .card {
+            background-color: white;
+            border-radius: 4px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        .card-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 16px;
+            border-bottom: 1px solid #eee;
+        }
+        .card-title {
+            display: flex;
+            align-items: center;
+        }
+        .card-title i {
+            margin-right: 8px;
+            color: #1976d2;
+        }
+        .card-content {
+            padding: 16px;
+        }
+        .card-action {
+            padding: 8px 16px;
+            text-align: right;
+        }
+        .btn {
+            background-color: transparent;
+            color: #1976d2;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            text-transform: uppercase;
+        }
+        .btn:hover {
+            background-color: rgba(25, 118, 210, 0.1);
+        }
+        .btn-primary {
+            background-color: #1976d2;
+            color: white;
+        }
+        .btn-primary:hover {
+            background-color: #1565c0;
+        }
+        .divider {
+            height: 1px;
+            background-color: #eee;
+            margin: 10px 0;
+        }
+        .breadcrumb {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        .breadcrumb a {
+            color: #1976d2;
+            text-decoration: none;
+        }
+        .breadcrumb span {
+            margin: 0 5px;
+        }
+        .active-division {
+            display: flex;
+            align-items: center;
+            padding: 8px 16px;
+            border-radius: 20px;
+            background-color: rgba(255, 255, 255, 0.2);
+            margin-left: 15px;
+        }
+        .active-division i {
+            margin-left: 5px;
+            font-size: 18px;
+        }
+        nav {
+            display: flex;
+            background-color: white;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .nav-item {
+            padding: 15px 20px;
+            color: #666;
+            text-decoration: none;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+        }
+        .nav-item i {
+            margin-right: 5px;
+        }
+        .nav-item.active {
+            color: #1976d2;
+            border-bottom: 2px solid #1976d2;
+        }
+        .nav-item:hover {
+            background-color: #f5f5f5;
+        }
+        footer {
+            margin-top: 40px;
+            padding: 20px;
+            text-align: center;
+            color: #666;
+            font-size: 0.9em;
+        }
+        .tab-bar {
+            display: flex;
+            background-color: white;
+            border-radius: 4px;
+            overflow: hidden;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        .tab {
+            padding: 15px 25px;
+            cursor: pointer;
+            font-weight: 500;
+        }
+        .tab.active {
+            background-color: #1976d2;
+            color: white;
+        }
+        .tab:hover:not(.active) {
+            background-color: #f5f5f5;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        thead {
+            background-color: #f5f5f5;
+        }
+        th, td {
+            text-align: left;
+            padding: 12px 15px;
+            border-bottom: 1px solid #eee;
+        }
+        tr:hover {
+            background-color: #f9f9f9;
+        }
+        .status-chip {
+            display: inline-block;
+            padding: 5px 12px;
+            border-radius: 16px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+        .status-planned {
+            background-color: #e3f2fd;
+            color: #1976d2;
+        }
+        .status-in-progress {
+            background-color: #e8f5e9;
+            color: #4caf50;
+        }
+        .status-completed {
+            background-color: #e8f5e9;
+            color: #4caf50;
+        }
+        .status-delayed {
+            background-color: #ffebee;
+            color: #f44336;
+        }
+        .status-on-hold {
+            background-color: #fff8e1;
+            color: #ff9800;
+        }
+        .gantt-chart {
+            height: 250px;
+            margin-top: 20px;
+            background-color: #f9f9f9;
+            border-radius: 4px;
+            position: relative;
+            overflow: hidden;
+        }
+        .gantt-chart::after {
+            content: "Gantt chart visualization would appear here";
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: #999;
+        }
+        .search-bar {
+            display: flex;
+            margin-bottom: 20px;
+        }
+        .search-input {
+            flex: 1;
+            padding: 10px 15px;
+            border: 1px solid #ddd;
+            border-radius: 4px 0 0 4px;
+            font-size: 16px;
+        }
+        .search-button {
+            background-color: #1976d2;
+            color: white;
+            border: none;
+            padding: 0 20px;
+            border-radius: 0 4px 4px 0;
+            cursor: pointer;
+        }
+        .filter-bar {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        .filter-chip {
+            background-color: #e3f2fd;
+            color: #1976d2;
+            padding: 5px 12px;
+            border-radius: 16px;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+        }
+        .filter-chip i {
+            font-size: 16px;
+            margin-left: 5px;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <h1>Zervi MRP</h1>
+                <div class="active-division">
+                    Automotive Division <i class="material-icons">arrow_drop_down</i>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <nav>
+        <div class="container" style="display: flex;">
+            <a href="../dashboard/index.html" class="nav-item"><i class="material-icons">dashboard</i> Dashboard</a>
+            <a href="../inventory/index.html" class="nav-item"><i class="material-icons">inventory_2</i> Inventory</a>
+            <a href="#" class="nav-item active"><i class="material-icons">precision_manufacturing</i> Manufacturing</a>
+            <a href="#" class="nav-item"><i class="material-icons">shopping_cart</i> Sales</a>
+            <a href="#" class="nav-item"><i class="material-icons">local_shipping</i> Procurement</a>
+            <a href="../transfers/index.html" class="nav-item"><i class="material-icons">swap_horiz</i> Transfers</a>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="breadcrumb">
+            <a href="../index.html">Home</a>
+            <span>/</span>
+            <a href="#">Manufacturing</a>
+        </div>
+
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+            <h2>Manufacturing Operations</h2>
+            <button class="btn btn-primary"><i class="material-icons" style="margin-right: 5px;">add</i> New Manufacturing Order</button>
+        </div>
+
+        <div class="tab-bar">
+            <div class="tab active">Manufacturing Orders</div>
+            <div class="tab">Production Schedule</div>
+            <div class="tab">Work Centers</div>
+            <div class="tab">BOMs</div>
+            <div class="tab">Routings</div>
+        </div>
+
+        <div class="card">
+            <div class="card-header">
+                <div class="card-title">
+                    <i class="material-icons">precision_manufacturing</i>
+                    <h3>Manufacturing Orders</h3>
+                </div>
+            </div>
+            <div class="card-content">
+                <div class="search-bar">
+                    <input type="text" class="search-input" placeholder="Search manufacturing orders...">
+                    <button class="search-button"><i class="material-icons">search</i></button>
+                </div>
+
+                <div class="filter-bar">
+                    <div class="filter-chip">Status: All <i class="material-icons">arrow_drop_down</i></div>
+                    <div class="filter-chip">Date Range: Last 30 Days <i class="material-icons">arrow_drop_down</i></div>
+                    <div class="filter-chip">Products: All <i class="material-icons">arrow_drop_down</i></div>
+                    <div class="filter-chip">Work Centers: All <i class="material-icons">arrow_drop_down</i></div>
+                </div>
+
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Order #</th>
+                            <th>Product</th>
+                            <th>Quantity</th>
+                            <th>Start Date</th>
+                            <th>Due Date</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>MO-2025-0348</td>
+                            <td>Car Seat Cover - Model A</td>
+                            <td>50</td>
+                            <td>Mar 25, 2025</td>
+                            <td>Apr 02, 2025</td>
+                            <td><span class="status-chip status-in-progress">In Progress</span></td>
+                            <td>
+                                <button class="btn">View</button>
+                                <button class="btn">Edit</button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>MO-2025-0347</td>
+                            <td>Dashboard Cover - Premium</td>
+                            <td>25</td>
+                            <td>Mar 24, 2025</td>
+                            <td>Mar 30, 2025</td>
+                            <td><span class="status-chip status-in-progress">In Progress</span></td>
+                            <td>
+                                <button class="btn">View</button>
+                                <button class="btn">Edit</button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>MO-2025-0346</td>
+                            <td>Floor Mat - Standard</td>
+                            <td>100</td>
+                            <td>Mar 23, 2025</td>
+                            <td>Mar 27, 2025</td>
+                            <td><span class="status-chip status-delayed">Delayed</span></td>
+                            <td>
+                                <button class="btn">View</button>
+                                <button class="btn">Edit</button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>MO-2025-0345</td>
+                            <td>Car Seat Cover - Model B</td>
+                            <td>35</td>
+                            <td>Mar 22, 2025</td>
+                            <td>Mar 28, 2025</td>
+                            <td><span class="status-chip status-completed">Completed</span></td>
+                            <td>
+                                <button class="btn">View</button>
+                                <button class="btn">Edit</button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>MO-2025-0344</td>
+                            <td>Sun Visor - Deluxe</td>
+                            <td>60</td>
+                            <td>Mar 21, 2025</td>
+                            <td>Mar 26, 2025</td>
+                            <td><span class="status-chip status-completed">Completed</span></td>
+                            <td>
+                                <button class="btn">View</button>
+                                <button class="btn">Edit</button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>MO-2025-0343</td>
+                            <td>Steering Wheel Cover</td>
+                            <td>80</td>
+                            <td>Mar 20, 2025</td>
+                            <td>Mar 29, 2025</td>
+                            <td><span class="status-chip status-on-hold">On Hold</span></td>
+                            <td>
+                                <button class="btn">View</button>
+                                <button class="btn">Edit</button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>MO-2025-0342</td>
+                            <td>Door Panel - Premium</td>
+                            <td>40</td>
+                            <td>Mar 18, 2025</td>
+                            <td>Mar 25, 2025</td>
+                            <td><span class="status-chip status-completed">Completed</span></td>
+                            <td>
+                                <button class="btn">View</button>
+                                <button class="btn">Edit</button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>MO-2025-0341</td>
+                            <td>Trunk Liner - Custom</td>
+                            <td>30</td>
+                            <td>Mar 17, 2025</td>
+                            <td>Mar 31, 2025</td>
+                            <td><span class="status-chip status-planned">Planned</span></td>
+                            <td>
+                                <button class="btn">View</button>
+                                <button class="btn">Edit</button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <div style="display: flex; justify-content: flex-end; margin-top: 20px; align-items: center;">
+                    <span style="margin-right: 20px;">Showing 1-8 of 56 orders</span>
+                    <button class="btn" disabled>Previous</button>
+                    <button class="btn">Next</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="card" style="margin-top: 20px;">
+            <div class="card-header">
+                <div class="card-title">
+                    <i class="material-icons">event</i>
+                    <h3>Production Schedule</h3>
+                </div>
+            </div>
+            <div class="card-content">
+                <div class="gantt-chart"></div>
+            </div>
+        </div>
+
+        <div class="card" style="margin-top: 20px;">
+            <div class="card-header">
+                <div class="card-title">
+                    <i class="material-icons">analytics</i>
+                    <h3>Production Metrics</h3>
+                </div>
+            </div>
+            <div class="card-content">
+                <div class="grid" style="grid-template-columns: repeat(4, 1fr);">
+                    <div style="text-align: center;">
+                        <h3>85%</h3>
+                        <p>On-Time Completion</p>
+                    </div>
+                    <div style="text-align: center;">
+                        <h3>92%</h3>
+                        <p>Resource Utilization</p>
+                    </div>
+                    <div style="text-align: center;">
+                        <h3>4.2 hrs</h3>
+                        <p>Avg. Production Time</p>
+                    </div>
+                    <div style="text-align: center;">
+                        <h3>3.1%</h3>
+                        <p>Defect Rate</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <div class="container">
+            <p>Zervi MRP Application UI Preview - Manufacturing</p>
+            <p><a href="../index.html" style="color: #1976d2; text-decoration: none;">Back to Main Navigation</a></p>
+        </div>
+    </footer>
+</body>
+</html>

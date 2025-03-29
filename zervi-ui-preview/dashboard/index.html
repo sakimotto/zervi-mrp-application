@@ -1,0 +1,556 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Zervi MRP - Dashboard</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap" />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons" />
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f5f5f5;
+            color: #333;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        header {
+            background-color: #1976d2;
+            color: white;
+            padding: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        h1, h2, h3, h4 {
+            margin-top: 0;
+            font-weight: 400;
+        }
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            margin-top: 20px;
+        }
+        @media (max-width: 900px) {
+            .grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+        @media (max-width: 600px) {
+            .grid {
+                grid-template-columns: 1fr;
+            }
+        }
+        .card {
+            background-color: white;
+            border-radius: 4px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        .card-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 16px;
+            border-bottom: 1px solid #eee;
+        }
+        .card-title {
+            display: flex;
+            align-items: center;
+        }
+        .card-title i {
+            margin-right: 8px;
+            color: #1976d2;
+        }
+        .card-content {
+            padding: 16px;
+        }
+        .card-action {
+            padding: 8px 16px;
+            text-align: right;
+        }
+        .btn {
+            background-color: transparent;
+            color: #1976d2;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            text-transform: uppercase;
+        }
+        .btn:hover {
+            background-color: rgba(25, 118, 210, 0.1);
+        }
+        .metric-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+        }
+        .metric-grid.three-cols {
+            grid-template-columns: repeat(3, 1fr);
+        }
+        .metric {
+            text-align: center;
+            padding: 10px;
+        }
+        .metric h3 {
+            margin: 0;
+            font-size: 24px;
+            font-weight: 500;
+        }
+        .metric p {
+            margin: 5px 0 0;
+            color: #666;
+            font-size: 12px;
+        }
+        .text-warning {
+            color: #ff9800;
+        }
+        .text-error {
+            color: #f44336;
+        }
+        .text-success {
+            color: #4caf50;
+        }
+        .text-info {
+            color: #2196f3;
+        }
+        .divider {
+            height: 1px;
+            background-color: #eee;
+            margin: 10px 0;
+        }
+        .breadcrumb {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        .breadcrumb a {
+            color: #1976d2;
+            text-decoration: none;
+        }
+        .breadcrumb span {
+            margin: 0 5px;
+        }
+        .dropdown {
+            position: relative;
+            display: inline-block;
+        }
+        .dropdown-content {
+            display: block;
+            position: absolute;
+            background-color: white;
+            min-width: 150px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            border-radius: 4px;
+            z-index: 1;
+            top: 40px;
+            right: 0;
+        }
+        .dropdown-item {
+            padding: 10px 15px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            display: flex;
+            align-items: center;
+        }
+        .dropdown-item:hover {
+            background-color: #f5f5f5;
+        }
+        .dropdown-item i {
+            margin-right: 8px;
+            font-size: 18px;
+        }
+        .active-division {
+            display: flex;
+            align-items: center;
+            padding: 8px 16px;
+            border-radius: 20px;
+            background-color: rgba(255, 255, 255, 0.2);
+            margin-left: 15px;
+        }
+        .active-division i {
+            margin-left: 5px;
+            font-size: 18px;
+        }
+        nav {
+            display: flex;
+            background-color: white;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .nav-item {
+            padding: 15px 20px;
+            color: #666;
+            text-decoration: none;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+        }
+        .nav-item i {
+            margin-right: 5px;
+        }
+        .nav-item.active {
+            color: #1976d2;
+            border-bottom: 2px solid #1976d2;
+        }
+        .nav-item:hover {
+            background-color: #f5f5f5;
+        }
+        footer {
+            margin-top: 40px;
+            padding: 20px;
+            text-align: center;
+            color: #666;
+            font-size: 0.9em;
+        }
+        .chart {
+            height: 200px;
+            background-color: #f9f9f9;
+            border-radius: 4px;
+            margin-top: 20px;
+            position: relative;
+            overflow: hidden;
+        }
+        .chart::after {
+            content: "Chart visualization would appear here";
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: #999;
+        }
+        .division-menu {
+            display: flex;
+            margin-top: 20px;
+            overflow-x: auto;
+            border-radius: 4px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .division-tab {
+            padding: 15px 20px;
+            background-color: white;
+            cursor: pointer;
+            min-width: 150px;
+            text-align: center;
+            border-right: 1px solid #eee;
+        }
+        .division-tab:last-child {
+            border-right: none;
+        }
+        .division-tab.active {
+            background-color: #1976d2;
+            color: white;
+        }
+        .recent-activity {
+            margin-top: 20px;
+        }
+        .activity-item {
+            padding: 10px 0;
+            display: flex;
+            align-items: center;
+            border-bottom: 1px solid #eee;
+        }
+        .activity-icon {
+            margin-right: 10px;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: #e3f2fd;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .activity-icon i {
+            color: #1976d2;
+        }
+        .activity-content {
+            flex: 1;
+        }
+        .activity-time {
+            color: #999;
+            font-size: 12px;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <h1>Zervi MRP</h1>
+                <div class="active-division">
+                    Automotive Division <i class="material-icons">arrow_drop_down</i>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <nav>
+        <div class="container" style="display: flex;">
+            <a href="#" class="nav-item active"><i class="material-icons">dashboard</i> Dashboard</a>
+            <a href="#" class="nav-item"><i class="material-icons">inventory_2</i> Inventory</a>
+            <a href="#" class="nav-item"><i class="material-icons">precision_manufacturing</i> Manufacturing</a>
+            <a href="#" class="nav-item"><i class="material-icons">shopping_cart</i> Sales</a>
+            <a href="#" class="nav-item"><i class="material-icons">local_shipping</i> Procurement</a>
+            <a href="#" class="nav-item"><i class="material-icons">swap_horiz</i> Transfers</a>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="breadcrumb">
+            <a href="../index.html">Home</a>
+            <span>/</span>
+            <a href="#">Dashboard</a>
+        </div>
+
+        <h2>Automotive Division Dashboard</h2>
+        <p>Welcome back, Admin User. Here's an overview of your manufacturing operations.</p>
+
+        <div class="division-menu">
+            <div class="division-tab active">Automotive</div>
+            <div class="division-tab">Camping</div>
+            <div class="division-tab">Apparel</div>
+            <div class="division-tab">Zervitek</div>
+        </div>
+
+        <div class="grid">
+            <!-- Inventory Summary Card -->
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title">
+                        <i class="material-icons">inventory</i>
+                        <h3>Inventory Summary</h3>
+                    </div>
+                    <button class="btn">View All</button>
+                </div>
+                <div class="card-content">
+                    <div class="metric-grid three-cols">
+                        <div class="metric">
+                            <h3>1,248</h3>
+                            <p>Total Items</p>
+                        </div>
+                        <div class="metric">
+                            <h3 class="text-warning">32</h3>
+                            <p>Low Stock</p>
+                        </div>
+                        <div class="metric">
+                            <h3 class="text-error">8</h3>
+                            <p>Out of Stock</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Manufacturing Orders Card -->
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title">
+                        <i class="material-icons">precision_manufacturing</i>
+                        <h3>Manufacturing Orders</h3>
+                    </div>
+                    <button class="btn">View All</button>
+                </div>
+                <div class="card-content">
+                    <div class="metric-grid">
+                        <div class="metric">
+                            <h3>56</h3>
+                            <p>Total</p>
+                        </div>
+                        <div class="metric">
+                            <h3 class="text-info">24</h3>
+                            <p>In Progress</p>
+                        </div>
+                        <div class="metric">
+                            <h3 class="text-success">28</h3>
+                            <p>Completed</p>
+                        </div>
+                        <div class="metric">
+                            <h3 class="text-error">4</h3>
+                            <p>Delayed</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Customer Orders Card -->
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title">
+                        <i class="material-icons">shopping_cart</i>
+                        <h3>Customer Orders</h3>
+                    </div>
+                    <button class="btn">View All</button>
+                </div>
+                <div class="card-content">
+                    <div class="metric-grid">
+                        <div class="metric">
+                            <h3>38</h3>
+                            <p>Total</p>
+                        </div>
+                        <div class="metric">
+                            <h3 class="text-warning">12</h3>
+                            <p>Pending</p>
+                        </div>
+                        <div class="metric">
+                            <h3 class="text-info">18</h3>
+                            <p>In Progress</p>
+                        </div>
+                        <div class="metric">
+                            <h3 class="text-success">8</h3>
+                            <p>Completed</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Purchase Orders Card -->
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title">
+                        <i class="material-icons">local_shipping</i>
+                        <h3>Purchase Orders</h3>
+                    </div>
+                    <button class="btn">View All</button>
+                </div>
+                <div class="card-content">
+                    <div class="metric-grid three-cols">
+                        <div class="metric">
+                            <h3>22</h3>
+                            <p>Total</p>
+                        </div>
+                        <div class="metric">
+                            <h3 class="text-warning">14</h3>
+                            <p>Pending</p>
+                        </div>
+                        <div class="metric">
+                            <h3 class="text-success">8</h3>
+                            <p>Received</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Inter-Division Transfers Card -->
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title">
+                        <i class="material-icons">swap_horiz</i>
+                        <h3>Inter-Division Transfers</h3>
+                    </div>
+                    <button class="btn">View All</button>
+                </div>
+                <div class="card-content">
+                    <div class="metric-grid three-cols">
+                        <div class="metric">
+                            <h3>15</h3>
+                            <p>Total</p>
+                        </div>
+                        <div class="metric">
+                            <h3 class="text-info">6</h3>
+                            <p>Incoming</p>
+                        </div>
+                        <div class="metric">
+                            <h3 class="text-warning">9</h3>
+                            <p>Outgoing</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Production Schedule Card -->
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title">
+                        <i class="material-icons">event</i>
+                        <h3>Production Schedule</h3>
+                    </div>
+                    <button class="btn">View Calendar</button>
+                </div>
+                <div class="card-content">
+                    <p>Upcoming production for next 7 days</p>
+                    <div class="chart"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="grid" style="grid-template-columns: 1fr 1fr; margin-top: 20px;">
+            <!-- Recent Activity Card -->
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title">
+                        <i class="material-icons">notifications</i>
+                        <h3>Recent Activity</h3>
+                    </div>
+                </div>
+                <div class="card-content">
+                    <div class="recent-activity">
+                        <div class="activity-item">
+                            <div class="activity-icon">
+                                <i class="material-icons">inventory_2</i>
+                            </div>
+                            <div class="activity-content">
+                                <div>Material X123 stock level is low (5 units remaining)</div>
+                                <div class="activity-time">10 minutes ago</div>
+                            </div>
+                        </div>
+                        <div class="activity-item">
+                            <div class="activity-icon">
+                                <i class="material-icons">precision_manufacturing</i>
+                            </div>
+                            <div class="activity-content">
+                                <div>Manufacturing Order #MO-2025-0342 completed</div>
+                                <div class="activity-time">45 minutes ago</div>
+                            </div>
+                        </div>
+                        <div class="activity-item">
+                            <div class="activity-icon">
+                                <i class="material-icons">swap_horiz</i>
+                            </div>
+                            <div class="activity-content">
+                                <div>New transfer from Zervitek division received</div>
+                                <div class="activity-time">1 hour ago</div>
+                            </div>
+                        </div>
+                        <div class="activity-item">
+                            <div class="activity-icon">
+                                <i class="material-icons">shopping_cart</i>
+                            </div>
+                            <div class="activity-content">
+                                <div>New customer order #CO-2025-0128 created</div>
+                                <div class="activity-time">2 hours ago</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Material Requirements Card -->
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title">
+                        <i class="material-icons">assignment</i>
+                        <h3>Material Requirements</h3>
+                    </div>
+                    <button class="btn">View Details</button>
+                </div>
+                <div class="card-content">
+                    <p>Forecasted material needs based on current orders</p>
+                    <div class="chart"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <div class="container">
+            <p>Zervi MRP Application UI Preview - Dashboard</p>
+            <p><a href="../index.html" style="color: #1976d2; text-decoration: none;">Back to Main Navigation</a></p>
+        </div>
+    </footer>
+</body>
+</html>

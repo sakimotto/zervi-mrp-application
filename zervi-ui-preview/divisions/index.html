@@ -1,0 +1,579 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Zervi MRP - Divisions</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap" />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons" />
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f5f5f5;
+            color: #333;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        header {
+            background-color: #1976d2;
+            color: white;
+            padding: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        h1, h2, h3, h4 {
+            margin-top: 0;
+            font-weight: 400;
+        }
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+            margin-top: 20px;
+        }
+        @media (max-width: 900px) {
+            .grid {
+                grid-template-columns: 1fr;
+            }
+        }
+        .card {
+            background-color: white;
+            border-radius: 4px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            overflow: hidden;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+        .card-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 16px;
+            border-bottom: 1px solid #eee;
+        }
+        .card-title {
+            display: flex;
+            align-items: center;
+        }
+        .card-title i {
+            margin-right: 8px;
+            color: #1976d2;
+        }
+        .card-content {
+            padding: 16px;
+            flex: 1;
+        }
+        .card-action {
+            padding: 16px;
+            text-align: center;
+            border-top: 1px solid #eee;
+        }
+        .btn {
+            background-color: transparent;
+            color: #1976d2;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            text-transform: uppercase;
+            text-decoration: none;
+            display: inline-block;
+        }
+        .btn:hover {
+            background-color: rgba(25, 118, 210, 0.1);
+        }
+        .btn-primary {
+            background-color: #1976d2;
+            color: white;
+        }
+        .btn-primary:hover {
+            background-color: #1565c0;
+        }
+        .divider {
+            height: 1px;
+            background-color: #eee;
+            margin: 10px 0;
+        }
+        .breadcrumb {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        .breadcrumb a {
+            color: #1976d2;
+            text-decoration: none;
+        }
+        .breadcrumb span {
+            margin: 0 5px;
+        }
+        nav {
+            display: flex;
+            background-color: white;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .nav-item {
+            padding: 15px 20px;
+            color: #666;
+            text-decoration: none;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+        }
+        .nav-item i {
+            margin-right: 5px;
+        }
+        .nav-item.active {
+            color: #1976d2;
+            border-bottom: 2px solid #1976d2;
+        }
+        .nav-item:hover {
+            background-color: #f5f5f5;
+        }
+        footer {
+            margin-top: 40px;
+            padding: 20px;
+            text-align: center;
+            color: #666;
+            font-size: 0.9em;
+        }
+        .division-card {
+            position: relative;
+        }
+        .division-header {
+            height: 120px;
+            background-size: cover;
+            background-position: center;
+            position: relative;
+        }
+        .division-header::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.3);
+        }
+        .division-title {
+            position: absolute;
+            bottom: 15px;
+            left: 15px;
+            z-index: 1;
+            color: white;
+            font-size: 24px;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
+        }
+        .kpi-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            margin-top: 10px;
+        }
+        .kpi-item {
+            background-color: #f9f9f9;
+            padding: 15px;
+            border-radius: 4px;
+            text-align: center;
+        }
+        .kpi-value {
+            font-size: 24px;
+            font-weight: 500;
+            margin-bottom: 5px;
+        }
+        .kpi-label {
+            font-size: 14px;
+            color: #666;
+        }
+        .division-description {
+            margin-bottom: 15px;
+            line-height: 1.5;
+        }
+        .active-products {
+            margin-top: 15px;
+        }
+        .product-item {
+            display: flex;
+            align-items: center;
+            padding: 8px 0;
+            border-bottom: 1px solid #eee;
+        }
+        .product-item:last-child {
+            border-bottom: none;
+        }
+        .product-icon {
+            width: 40px;
+            height: 40px;
+            background-color: #e3f2fd;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 10px;
+        }
+        .product-icon i {
+            color: #1976d2;
+        }
+        .product-content {
+            flex: 1;
+        }
+        .product-title {
+            font-weight: 500;
+        }
+        .product-subtitle {
+            font-size: 12px;
+            color: #666;
+        }
+        .auto-color {
+            background-color: #bbdefb;
+        }
+        .camping-color {
+            background-color: #c8e6c9;
+        }
+        .apparel-color {
+            background-color: #ffecb3;
+        }
+        .zervitek-color {
+            background-color: #e1bee7;
+        }
+        .stat-trend {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            margin-top: 5px;
+        }
+        .trend-up {
+            color: #4caf50;
+        }
+        .trend-down {
+            color: #f44336;
+        }
+        .trend-icon {
+            font-size: 16px;
+            margin-right: 2px;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <h1>Zervi MRP</h1>
+            </div>
+        </div>
+    </header>
+
+    <nav>
+        <div class="container" style="display: flex;">
+            <a href="../dashboard/index.html" class="nav-item"><i class="material-icons">dashboard</i> Dashboard</a>
+            <a href="../inventory/index.html" class="nav-item"><i class="material-icons">inventory_2</i> Inventory</a>
+            <a href="../manufacturing/index.html" class="nav-item"><i class="material-icons">precision_manufacturing</i> Manufacturing</a>
+            <a href="#" class="nav-item"><i class="material-icons">shopping_cart</i> Sales</a>
+            <a href="#" class="nav-item"><i class="material-icons">local_shipping</i> Procurement</a>
+            <a href="../transfers/index.html" class="nav-item"><i class="material-icons">swap_horiz</i> Transfers</a>
+            <a href="#" class="nav-item active"><i class="material-icons">business</i> Divisions</a>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="breadcrumb">
+            <a href="../index.html">Home</a>
+            <span>/</span>
+            <a href="#">Divisions</a>
+        </div>
+
+        <h2>Zervi Group Divisions</h2>
+        <p>Zervi Group operates across four specialized manufacturing divisions with vertical integration between them. Each division has its own production facilities, product lines, and markets, but they share common materials and technologies.</p>
+
+        <div class="grid">
+            <!-- Automotive Division Card -->
+            <div class="card division-card">
+                <div class="division-header" style="background-image: url('https://images.unsplash.com/photo-1552642986-ccb41e7059e7?auto=format&fit=crop&w=600');">
+                    <h3 class="division-title">Automotive Division</h3>
+                </div>
+                <div class="card-content">
+                    <div class="division-description">
+                        Specializes in manufacturing textile-based automotive components including seat covers, dashboard covers, floor mats, and other interior trim products for OEM and aftermarket segments.
+                    </div>
+                    
+                    <h4>Division KPIs</h4>
+                    <div class="kpi-grid">
+                        <div class="kpi-item auto-color">
+                            <div class="kpi-value">94.3%</div>
+                            <div class="kpi-label">On-Time Delivery</div>
+                            <div class="stat-trend trend-up"><i class="material-icons trend-icon">arrow_upward</i> 2.1%</div>
+                        </div>
+                        <div class="kpi-item auto-color">
+                            <div class="kpi-value">$1.24M</div>
+                            <div class="kpi-label">Monthly Revenue</div>
+                            <div class="stat-trend trend-up"><i class="material-icons trend-icon">arrow_upward</i> 5.3%</div>
+                        </div>
+                        <div class="kpi-item auto-color">
+                            <div class="kpi-value">2.8%</div>
+                            <div class="kpi-label">Defect Rate</div>
+                            <div class="stat-trend trend-down"><i class="material-icons trend-icon">arrow_downward</i> 0.4%</div>
+                        </div>
+                        <div class="kpi-item auto-color">
+                            <div class="kpi-value">8,540</div>
+                            <div class="kpi-label">Monthly Units</div>
+                            <div class="stat-trend trend-up"><i class="material-icons trend-icon">arrow_upward</i> 420</div>
+                        </div>
+                    </div>
+
+                    <h4>Top Products</h4>
+                    <div class="active-products">
+                        <div class="product-item">
+                            <div class="product-icon"><i class="material-icons">event_seat</i></div>
+                            <div class="product-content">
+                                <div class="product-title">Premium Seat Covers</div>
+                                <div class="product-subtitle">3,200 units/month</div>
+                            </div>
+                        </div>
+                        <div class="product-item">
+                            <div class="product-icon"><i class="material-icons">dashboard</i></div>
+                            <div class="product-content">
+                                <div class="product-title">Dashboard Covers</div>
+                                <div class="product-subtitle">2,850 units/month</div>
+                            </div>
+                        </div>
+                        <div class="product-item">
+                            <div class="product-icon"><i class="material-icons">widgets</i></div>
+                            <div class="product-content">
+                                <div class="product-title">Custom Floor Mats</div>
+                                <div class="product-subtitle">2,490 units/month</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-action">
+                    <a href="../dashboard/index.html" class="btn btn-primary">Open Division Dashboard</a>
+                </div>
+            </div>
+
+            <!-- Camping Division Card -->
+            <div class="card division-card">
+                <div class="division-header" style="background-image: url('https://images.unsplash.com/photo-1504280390367-361c6d9f38f4?auto=format&fit=crop&w=600');">
+                    <h3 class="division-title">Camping Production Division</h3>
+                </div>
+                <div class="card-content">
+                    <div class="division-description">
+                        Produces a range of camping and outdoor products including tents, sleeping bags, camping furniture, and weather-resistant gear that utilize specialized technical textiles from the Zervitek division.
+                    </div>
+                    
+                    <h4>Division KPIs</h4>
+                    <div class="kpi-grid">
+                        <div class="kpi-item camping-color">
+                            <div class="kpi-value">91.8%</div>
+                            <div class="kpi-label">On-Time Delivery</div>
+                            <div class="stat-trend trend-up"><i class="material-icons trend-icon">arrow_upward</i> 1.3%</div>
+                        </div>
+                        <div class="kpi-item camping-color">
+                            <div class="kpi-value">$0.86M</div>
+                            <div class="kpi-label">Monthly Revenue</div>
+                            <div class="stat-trend trend-up"><i class="material-icons trend-icon">arrow_upward</i> 12.4%</div>
+                        </div>
+                        <div class="kpi-item camping-color">
+                            <div class="kpi-value">3.1%</div>
+                            <div class="kpi-label">Defect Rate</div>
+                            <div class="stat-trend trend-down"><i class="material-icons trend-icon">arrow_downward</i> 0.2%</div>
+                        </div>
+                        <div class="kpi-item camping-color">
+                            <div class="kpi-value">5,250</div>
+                            <div class="kpi-label">Monthly Units</div>
+                            <div class="stat-trend trend-up"><i class="material-icons trend-icon">arrow_upward</i> 680</div>
+                        </div>
+                    </div>
+
+                    <h4>Top Products</h4>
+                    <div class="active-products">
+                        <div class="product-item">
+                            <div class="product-icon"><i class="material-icons">home</i></div>
+                            <div class="product-content">
+                                <div class="product-title">All-Weather Tents</div>
+                                <div class="product-subtitle">1,450 units/month</div>
+                            </div>
+                        </div>
+                        <div class="product-item">
+                            <div class="product-icon"><i class="material-icons">nightlight</i></div>
+                            <div class="product-content">
+                                <div class="product-title">Insulated Sleeping Bags</div>
+                                <div class="product-subtitle">1,830 units/month</div>
+                            </div>
+                        </div>
+                        <div class="product-item">
+                            <div class="product-icon"><i class="material-icons">weekend</i></div>
+                            <div class="product-content">
+                                <div class="product-title">Foldable Camp Chairs</div>
+                                <div class="product-subtitle">1,970 units/month</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-action">
+                    <a href="../dashboard/index.html" class="btn btn-primary">Open Division Dashboard</a>
+                </div>
+            </div>
+
+            <!-- Apparel Division Card -->
+            <div class="card division-card">
+                <div class="division-header" style="background-image: url('https://images.unsplash.com/photo-1556905055-8f358a7a47b2?auto=format&fit=crop&w=600');">
+                    <h3 class="division-title">Apparel Division</h3>
+                </div>
+                <div class="card-content">
+                    <div class="division-description">
+                        Manufactures specialized apparel including high-performance sportswear, workwear, and protective clothing using technical textiles with moisture-wicking, flame-resistant, and other specialized properties.
+                    </div>
+                    
+                    <h4>Division KPIs</h4>
+                    <div class="kpi-grid">
+                        <div class="kpi-item apparel-color">
+                            <div class="kpi-value">93.5%</div>
+                            <div class="kpi-label">On-Time Delivery</div>
+                            <div class="stat-trend trend-up"><i class="material-icons trend-icon">arrow_upward</i> 1.8%</div>
+                        </div>
+                        <div class="kpi-item apparel-color">
+                            <div class="kpi-value">$0.95M</div>
+                            <div class="kpi-label">Monthly Revenue</div>
+                            <div class="stat-trend trend-up"><i class="material-icons trend-icon">arrow_upward</i> 7.6%</div>
+                        </div>
+                        <div class="kpi-item apparel-color">
+                            <div class="kpi-value">2.4%</div>
+                            <div class="kpi-label">Defect Rate</div>
+                            <div class="stat-trend trend-down"><i class="material-icons trend-icon">arrow_downward</i> 0.3%</div>
+                        </div>
+                        <div class="kpi-item apparel-color">
+                            <div class="kpi-value">12,680</div>
+                            <div class="kpi-label">Monthly Units</div>
+                            <div class="stat-trend trend-up"><i class="material-icons trend-icon">arrow_upward</i> 840</div>
+                        </div>
+                    </div>
+
+                    <h4>Top Products</h4>
+                    <div class="active-products">
+                        <div class="product-item">
+                            <div class="product-icon"><i class="material-icons">sports_handball</i></div>
+                            <div class="product-content">
+                                <div class="product-title">Performance Athletic Wear</div>
+                                <div class="product-subtitle">5,240 units/month</div>
+                            </div>
+                        </div>
+                        <div class="product-item">
+                            <div class="product-icon"><i class="material-icons">engineering</i></div>
+                            <div class="product-content">
+                                <div class="product-title">Industrial Workwear</div>
+                                <div class="product-subtitle">4,320 units/month</div>
+                            </div>
+                        </div>
+                        <div class="product-item">
+                            <div class="product-icon"><i class="material-icons">water</i></div>
+                            <div class="product-content">
+                                <div class="product-title">Waterproof Outerwear</div>
+                                <div class="product-subtitle">3,120 units/month</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-action">
+                    <a href="../dashboard/index.html" class="btn btn-primary">Open Division Dashboard</a>
+                </div>
+            </div>
+
+            <!-- Zervitek Division Card -->
+            <div class="card division-card">
+                <div class="division-header" style="background-image: url('https://images.unsplash.com/photo-1518623489648-a173ef7824f3?auto=format&fit=crop&w=600');">
+                    <h3 class="division-title">Zervitek (Technical Textile)</h3>
+                </div>
+                <div class="card-content">
+                    <div class="division-description">
+                        Produces advanced technical textiles that serve as key inputs for other divisions. Specializes in lamination, coating, and other textile processing technologies to create materials with specific performance characteristics.
+                    </div>
+                    
+                    <h4>Division KPIs</h4>
+                    <div class="kpi-grid">
+                        <div class="kpi-item zervitek-color">
+                            <div class="kpi-value">96.2%</div>
+                            <div class="kpi-label">On-Time Delivery</div>
+                            <div class="stat-trend trend-up"><i class="material-icons trend-icon">arrow_upward</i> 1.5%</div>
+                        </div>
+                        <div class="kpi-item zervitek-color">
+                            <div class="kpi-value">$1.52M</div>
+                            <div class="kpi-label">Monthly Revenue</div>
+                            <div class="stat-trend trend-up"><i class="material-icons trend-icon">arrow_upward</i> 4.2%</div>
+                        </div>
+                        <div class="kpi-item zervitek-color">
+                            <div class="kpi-value">1.8%</div>
+                            <div class="kpi-label">Defect Rate</div>
+                            <div class="stat-trend trend-down"><i class="material-icons trend-icon">arrow_downward</i> 0.6%</div>
+                        </div>
+                        <div class="kpi-item zervitek-color">
+                            <div class="kpi-value">48,500</div>
+                            <div class="kpi-label">Monthly m²</div>
+                            <div class="stat-trend trend-up"><i class="material-icons trend-icon">arrow_upward</i> 2,300</div>
+                        </div>
+                    </div>
+
+                    <h4>Top Products</h4>
+                    <div class="active-products">
+                        <div class="product-item">
+                            <div class="product-icon"><i class="material-icons">texture</i></div>
+                            <div class="product-content">
+                                <div class="product-title">Laminated Technical Textiles</div>
+                                <div class="product-subtitle">18,500 m²/month</div>
+                            </div>
+                        </div>
+                        <div class="product-item">
+                            <div class="product-icon"><i class="material-icons">opacity</i></div>
+                            <div class="product-content">
+                                <div class="product-title">Waterproof Membranes</div>
+                                <div class="product-subtitle">15,200 m²/month</div>
+                            </div>
+                        </div>
+                        <div class="product-item">
+                            <div class="product-icon"><i class="material-icons">local_fire_department</i></div>
+                            <div class="product-content">
+                                <div class="product-title">Fire-Resistant Fabrics</div>
+                                <div class="product-subtitle">14,800 m²/month</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-action">
+                    <a href="../dashboard/index.html" class="btn btn-primary">Open Division Dashboard</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="card" style="margin-top: 20px;">
+            <div class="card-header">
+                <div class="card-title">
+                    <i class="material-icons">swap_horiz</i>
+                    <h3>Inter-Division Material Flow</h3>
+                </div>
+            </div>
+            <div class="card-content">
+                <p>The Zervi Group's vertical integration model enables efficient flow of materials between divisions. Zervitek (Technical Textile) serves as the primary supplier of specialized textile materials to other divisions, creating value through tailored material solutions for specific end products.</p>
+                
+                <div style="height: 250px; background-color: #f9f9f9; border-radius: 4px; position: relative; margin-top: 20px;">
+                    <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color: #999;">
+                        Material flow diagram would appear here
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <div class="container">
+            <p>Zervi MRP Application UI Preview - Divisions</p>
+            <p><a href="../index.html" style="color: #1976d2; text-decoration: none;">Back to Main Navigation</a></p>
+        </div>
+    </footer>
+</body>
+</html>

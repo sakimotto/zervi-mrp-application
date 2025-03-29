@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Zervi MRP Application UI Preview</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap" />
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f5f5f5;
+            color: #333;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        header {
+            background-color: #1976d2;
+            color: white;
+            padding: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        h1 {
+            margin: 0;
+            font-weight: 400;
+        }
+        .subtitle {
+            font-weight: 300;
+            margin-top: 10px;
+        }
+        .card {
+            background-color: white;
+            border-radius: 4px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+            padding: 20px;
+        }
+        .navigation {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+        .nav-item {
+            background-color: white;
+            border-radius: 4px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            padding: 15px;
+            text-align: center;
+            transition: transform 0.2s;
+            cursor: pointer;
+        }
+        .nav-item:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+        .nav-item h3 {
+            margin-top: 0;
+            color: #1976d2;
+        }
+        .nav-item p {
+            color: #666;
+        }
+        footer {
+            margin-top: 40px;
+            padding: 20px;
+            text-align: center;
+            color: #666;
+            font-size: 0.9em;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <h1>Zervi MRP Application UI Preview</h1>
+            <p class="subtitle">Static HTML preview of the React-based user interface</p>
+        </div>
+    </header>
+
+    <div class="container">
+        <div class="card">
+            <h2>About This Preview</h2>
+            <p>This is a static HTML preview of the Zervi MRP application user interface. The original application is built with React and Material UI, but this preview uses plain HTML to display the layout and design without requiring the full application stack.</p>
+            <p>Select a section below to view the UI components for that area of the application.</p>
+        </div>
+
+        <div class="navigation">
+            <a href="dashboard/index.html" style="text-decoration: none;">
+                <div class="nav-item">
+                    <h3>Dashboard</h3>
+                    <p>Main overview with key metrics and KPIs for each division</p>
+                </div>
+            </a>
+            <a href="manufacturing/index.html" style="text-decoration: none;">
+                <div class="nav-item">
+                    <h3>Manufacturing</h3>
+                    <p>Manufacturing orders, operations, and production scheduling</p>
+                </div>
+            </a>
+            <a href="inventory/index.html" style="text-decoration: none;">
+                <div class="nav-item">
+                    <h3>Inventory</h3>
+                    <p>Inventory management, stock levels, and warehouse locations</p>
+                </div>
+            </a>
+            <a href="divisions/index.html" style="text-decoration: none;">
+                <div class="nav-item">
+                    <h3>Divisions</h3>
+                    <p>Division-specific views for Automotive, Camping, Apparel, and Zervitek</p>
+                </div>
+            </a>
+            <a href="transfers/index.html" style="text-decoration: none;">
+                <div class="nav-item">
+                    <h3>Transfers</h3>
+                    <p>Inter-division transfer system for materials and semi-finished goods</p>
+                </div>
+            </a>
+        </div>
+
+        <div class="card">
+            <h2>Original Project Structure</h2>
+            <p>The Zervi MRP application is built with the following technologies:</p>
+            <ul>
+                <li><strong>Frontend:</strong> React with Material UI components</li>
+                <li><strong>Backend:</strong> Node.js with Express and TypeScript</li>
+                <li><strong>Database:</strong> PostgreSQL with TypeORM</li>
+            </ul>
+            <p>The application's frontend has a structure of reusable components and dedicated pages for each area of functionality.</p>
+        </div>
+    </div>
+
+    <footer>
+        <div class="container">
+            <p>Zervi MRP Application UI Preview - Created on March 29, 2025</p>
+            <p>This is a static preview for feedback purposes only - not the actual application.</p>
+        </div>
+    </footer>
+</body>
+</html>
