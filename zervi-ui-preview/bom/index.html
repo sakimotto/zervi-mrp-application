@@ -1,0 +1,576 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Zervi MRP - BOM Management</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap" />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons" />
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f5f5f5;
+            color: #333;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        header {
+            background-color: #1976d2;
+            color: white;
+            padding: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        h1, h2, h3, h4 {
+            margin-top: 0;
+            font-weight: 400;
+        }
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            margin-top: 20px;
+        }
+        @media (max-width: 900px) {
+            .grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+        @media (max-width: 600px) {
+            .grid {
+                grid-template-columns: 1fr;
+            }
+        }
+        .card {
+            background-color: white;
+            border-radius: 4px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        .card-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 16px;
+            border-bottom: 1px solid #eee;
+        }
+        .card-title {
+            display: flex;
+            align-items: center;
+        }
+        .card-title i {
+            margin-right: 8px;
+            color: #1976d2;
+        }
+        .card-content {
+            padding: 16px;
+        }
+        .card-action {
+            padding: 8px 16px;
+            text-align: right;
+        }
+        .btn {
+            background-color: transparent;
+            color: #1976d2;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            text-transform: uppercase;
+        }
+        .btn:hover {
+            background-color: rgba(25, 118, 210, 0.1);
+        }
+        .btn.primary {
+            background-color: #1976d2;
+            color: white;
+        }
+        .btn.primary:hover {
+            background-color: #1565c0;
+        }
+        .metric-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+        }
+        .metric-grid.three-cols {
+            grid-template-columns: repeat(3, 1fr);
+        }
+        .metric {
+            text-align: center;
+            padding: 10px;
+        }
+        .metric h3 {
+            margin: 0;
+            font-size: 24px;
+            font-weight: 500;
+        }
+        .metric p {
+            margin: 5px 0 0;
+            color: #666;
+            font-size: 12px;
+        }
+        .text-warning {
+            color: #ff9800;
+        }
+        .text-error {
+            color: #f44336;
+        }
+        .text-success {
+            color: #4caf50;
+        }
+        .text-info {
+            color: #2196f3;
+        }
+        .divider {
+            height: 1px;
+            background-color: #eee;
+            margin: 10px 0;
+        }
+        .breadcrumb {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        .breadcrumb a {
+            color: #1976d2;
+            text-decoration: none;
+        }
+        .breadcrumb span {
+            margin: 0 5px;
+        }
+        .dropdown {
+            position: relative;
+            display: inline-block;
+        }
+        .dropdown-content {
+            display: block;
+            position: absolute;
+            background-color: white;
+            min-width: 150px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            border-radius: 4px;
+            z-index: 1;
+            top: 40px;
+            right: 0;
+        }
+        .dropdown-item {
+            padding: 10px 15px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            display: flex;
+            align-items: center;
+        }
+        .dropdown-item:hover {
+            background-color: #f5f5f5;
+        }
+        .dropdown-item i {
+            margin-right: 8px;
+            font-size: 18px;
+        }
+        .active-division {
+            display: flex;
+            align-items: center;
+            padding: 8px 16px;
+            border-radius: 20px;
+            background-color: rgba(255, 255, 255, 0.2);
+            margin-left: 15px;
+        }
+        .active-division i {
+            margin-left: 5px;
+            font-size: 18px;
+        }
+        nav {
+            display: flex;
+            background-color: white;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .nav-item {
+            padding: 15px 20px;
+            color: #666;
+            text-decoration: none;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+        }
+        .nav-item i {
+            margin-right: 5px;
+        }
+        .nav-item.active {
+            color: #1976d2;
+            border-bottom: 2px solid #1976d2;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th, td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+        }
+        th {
+            background-color: #f9f9f9;
+            font-weight: 500;
+        }
+        tbody tr:hover {
+            background-color: #f5f5f5;
+        }
+        .search-bar {
+            display: flex;
+            margin-bottom: 20px;
+        }
+        .search-input {
+            flex: 1;
+            padding: 10px 15px;
+            border: 1px solid #ddd;
+            border-radius: 4px 0 0 4px;
+            font-size: 14px;
+        }
+        .search-button {
+            background-color: #1976d2;
+            color: white;
+            border: none;
+            border-radius: 0 4px 4px 0;
+            padding: 0 15px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+        }
+        .filter-bar {
+            display: flex;
+            margin-bottom: 20px;
+            gap: 10px;
+        }
+        .filter-select {
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            flex: 1;
+        }
+        .status-chip {
+            display: inline-block;
+            padding: 5px 12px;
+            border-radius: 16px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+        .status-active {
+            background-color: rgba(76, 175, 80, 0.1);
+            color: #4caf50;
+        }
+        .status-inactive {
+            background-color: rgba(244, 67, 54, 0.1);
+            color: #f44336;
+        }
+        .status-pending {
+            background-color: rgba(255, 152, 0, 0.1);
+            color: #ff9800;
+        }
+        footer {
+            margin-top: 40px;
+            padding: 20px 0;
+            background-color: #f1f1f1;
+            text-align: center;
+            color: #666;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <h1>Zervi MRP</h1>
+                <div style="display: flex; align-items: center;">
+                    <div class="active-division">
+                        Camping Division
+                        <i class="material-icons">arrow_drop_down</i>
+                    </div>
+                    <div style="margin-left: 20px; display: flex; align-items: center;">
+                        <i class="material-icons" style="margin-right: 5px;">account_circle</i>
+                        John Smith
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <nav>
+        <div class="container" style="display: flex;">
+            <a href="../dashboard/index.html" class="nav-item">
+                <i class="material-icons">dashboard</i> Dashboard
+            </a>
+            <a href="../divisions/index.html" class="nav-item">
+                <i class="material-icons">business</i> Divisions
+            </a>
+            <a href="../inventory/index.html" class="nav-item">
+                <i class="material-icons">inventory_2</i> Inventory
+            </a>
+            <a href="../manufacturing/index.html" class="nav-item">
+                <i class="material-icons">precision_manufacturing</i> Manufacturing
+            </a>
+            <a href="index.html" class="nav-item active">
+                <i class="material-icons">account_tree</i> BOM
+            </a>
+            <a href="../transfers/index.html" class="nav-item">
+                <i class="material-icons">swap_horiz</i> Transfers
+            </a>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="breadcrumb">
+            <a href="../index.html">Home</a>
+            <span>/</span>
+            <a href="#">BOM Management</a>
+        </div>
+
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+            <h2>Bill of Materials</h2>
+            <button class="btn primary">
+                <i class="material-icons" style="font-size: 18px; margin-right: 5px;">add</i>
+                Create New BOM
+            </button>
+        </div>
+
+        <div class="card">
+            <div class="card-header">
+                <div class="card-title">
+                    <i class="material-icons">account_tree</i>
+                    <h3>BOM List</h3>
+                </div>
+            </div>
+            <div class="card-content">
+                <div class="search-bar">
+                    <input type="text" class="search-input" placeholder="Search BOMs...">
+                    <button class="search-button"><i class="material-icons">search</i></button>
+                </div>
+
+                <div class="filter-bar">
+                    <select class="filter-select">
+                        <option>All Divisions</option>
+                        <option>Automotive</option>
+                        <option selected>Camping</option>
+                        <option>Apparel</option>
+                        <option>Zervitek</option>
+                    </select>
+                    <select class="filter-select">
+                        <option>All Statuses</option>
+                        <option selected>Active</option>
+                        <option>Inactive</option>
+                        <option>Draft</option>
+                    </select>
+                    <select class="filter-select">
+                        <option>All Item Types</option>
+                        <option>Raw Materials</option>
+                        <option>Semi-Finished</option>
+                        <option>Finished Products</option>
+                    </select>
+                </div>
+
+                <table>
+                    <thead>
+                        <tr>
+                            <th>BOM #</th>
+                            <th>Name</th>
+                            <th>Item</th>
+                            <th>Division</th>
+                            <th>Components</th>
+                            <th>Version</th>
+                            <th>Last Updated</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>BOM-0001</td>
+                            <td>4-Person Camping Tent</td>
+                            <td>CAMP-TENT-4P</td>
+                            <td>Camping</td>
+                            <td>12</td>
+                            <td>2.1</td>
+                            <td>03/15/2025</td>
+                            <td><span class="status-chip status-active">Active</span></td>
+                            <td>
+                                <button class="btn" style="padding: 4px 8px; min-width: 0;">
+                                    <i class="material-icons" style="font-size: 18px;">visibility</i>
+                                </button>
+                                <button class="btn" style="padding: 4px 8px; min-width: 0;">
+                                    <i class="material-icons" style="font-size: 18px;">edit</i>
+                                </button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>BOM-0002</td>
+                            <td>2-Person Camping Tent</td>
+                            <td>CAMP-TENT-2P</td>
+                            <td>Camping</td>
+                            <td>9</td>
+                            <td>1.3</td>
+                            <td>03/12/2025</td>
+                            <td><span class="status-chip status-active">Active</span></td>
+                            <td>
+                                <button class="btn" style="padding: 4px 8px; min-width: 0;">
+                                    <i class="material-icons" style="font-size: 18px;">visibility</i>
+                                </button>
+                                <button class="btn" style="padding: 4px 8px; min-width: 0;">
+                                    <i class="material-icons" style="font-size: 18px;">edit</i>
+                                </button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>BOM-0003</td>
+                            <td>Heavy-Duty Backpack</td>
+                            <td>CAMP-BACK-HD</td>
+                            <td>Camping</td>
+                            <td>7</td>
+                            <td>1.5</td>
+                            <td>03/05/2025</td>
+                            <td><span class="status-chip status-active">Active</span></td>
+                            <td>
+                                <button class="btn" style="padding: 4px 8px; min-width: 0;">
+                                    <i class="material-icons" style="font-size: 18px;">visibility</i>
+                                </button>
+                                <button class="btn" style="padding: 4px 8px; min-width: 0;">
+                                    <i class="material-icons" style="font-size: 18px;">edit</i>
+                                </button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>BOM-0004</td>
+                            <td>Sleeping Bag Pro</td>
+                            <td>CAMP-SB-PRO</td>
+                            <td>Camping</td>
+                            <td>5</td>
+                            <td>1.2</td>
+                            <td>02/28/2025</td>
+                            <td><span class="status-chip status-active">Active</span></td>
+                            <td>
+                                <button class="btn" style="padding: 4px 8px; min-width: 0;">
+                                    <i class="material-icons" style="font-size: 18px;">visibility</i>
+                                </button>
+                                <button class="btn" style="padding: 4px 8px; min-width: 0;">
+                                    <i class="material-icons" style="font-size: 18px;">edit</i>
+                                </button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>BOM-0005</td>
+                            <td>Camping Chair Deluxe</td>
+                            <td>CAMP-CHAIR-DLX</td>
+                            <td>Camping</td>
+                            <td>6</td>
+                            <td>1.0</td>
+                            <td>02/15/2025</td>
+                            <td><span class="status-chip status-active">Active</span></td>
+                            <td>
+                                <button class="btn" style="padding: 4px 8px; min-width: 0;">
+                                    <i class="material-icons" style="font-size: 18px;">visibility</i>
+                                </button>
+                                <button class="btn" style="padding: 4px 8px; min-width: 0;">
+                                    <i class="material-icons" style="font-size: 18px;">edit</i>
+                                </button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>BOM-0006</td>
+                            <td>Quick-Pitch Tent 2-Person</td>
+                            <td>CAMP-QPTENT-2P</td>
+                            <td>Camping</td>
+                            <td>8</td>
+                            <td>0.9</td>
+                            <td>02/10/2025</td>
+                            <td><span class="status-chip status-pending">Draft</span></td>
+                            <td>
+                                <button class="btn" style="padding: 4px 8px; min-width: 0;">
+                                    <i class="material-icons" style="font-size: 18px;">visibility</i>
+                                </button>
+                                <button class="btn" style="padding: 4px 8px; min-width: 0;">
+                                    <i class="material-icons" style="font-size: 18px;">edit</i>
+                                </button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <div style="display: flex; justify-content: flex-end; margin-top: 20px; align-items: center;">
+                    <span style="margin-right: 20px;">Showing 1-6 of 12 BOMs</span>
+                    <button class="btn" disabled>Previous</button>
+                    <button class="btn primary">1</button>
+                    <button class="btn">2</button>
+                    <button class="btn">Next</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="card" style="margin-top: 20px;">
+            <div class="card-header">
+                <div class="card-title">
+                    <i class="material-icons">analytics</i>
+                    <h3>BOM Statistics</h3>
+                </div>
+            </div>
+            <div class="card-content">
+                <div class="metric-grid">
+                    <div class="metric">
+                        <h3>12</h3>
+                        <p>Total BOMs</p>
+                    </div>
+                    <div class="metric">
+                        <h3 class="text-success">10</h3>
+                        <p>Active BOMs</p>
+                    </div>
+                    <div class="metric">
+                        <h3 class="text-warning">2</h3>
+                        <p>Draft BOMs</p>
+                    </div>
+                    <div class="metric">
+                        <h3 class="text-info">3</h3>
+                        <p>New this month</p>
+                    </div>
+                </div>
+
+                <div class="divider"></div>
+
+                <h4 style="margin-top: 16px;">BOMs by Division</h4>
+                <div style="display: flex; height: 120px; margin-top: 16px;">
+                    <div style="flex: 1; display: flex; flex-direction: column; align-items: center;">
+                        <div style="background-color: #1976d2; width: 50px; height: 30px; margin-bottom: 8px;"></div>
+                        <div>Automotive</div>
+                        <div style="font-weight: 500;">5</div>
+                    </div>
+                    <div style="flex: 1; display: flex; flex-direction: column; align-items: center;">
+                        <div style="background-color: #1976d2; width: 50px; height: 80px; margin-bottom: 8px;"></div>
+                        <div>Camping</div>
+                        <div style="font-weight: 500;">12</div>
+                    </div>
+                    <div style="flex: 1; display: flex; flex-direction: column; align-items: center;">
+                        <div style="background-color: #1976d2; width: 50px; height: 50px; margin-bottom: 8px;"></div>
+                        <div>Apparel</div>
+                        <div style="font-weight: 500;">8</div>
+                    </div>
+                    <div style="flex: 1; display: flex; flex-direction: column; align-items: center;">
+                        <div style="background-color: #1976d2; width: 50px; height: 20px; margin-bottom: 8px;"></div>
+                        <div>Zervitek</div>
+                        <div style="font-weight: 500;">3</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <div class="container">
+            <p>Zervi MRP Application UI Preview - BOM Management</p>
+        </div>
+    </footer>
+</body>
+</html>
