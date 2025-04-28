@@ -4,6 +4,100 @@
 
 This document outlines a comprehensive implementation plan for completing the Zervi MRP Application. The plan follows a structured approach with clear milestones, focusing on integrating the components provided by Manus and completing the remaining development work.
 
+## Architecture Overview
+
+### 1. Context Diagram  
+```mermaid
+graph TB
+  %% Actors
+  User((End User))
+  ThirdParty[(3rd-Party Services)]
+  %% System
+  subgraph Zervi MRP System
+    UI[Zervi UI<br/>(Static HTML/JS)]
+    API[Minimal Backend API<br/>(Node/Express TS)]
+    DB[(Postgres DB)]
+  end
+
+  User --> UI        : “Use web app”
+  UI --> API         : “HTTP requests (REST/JSON)”
+  API --> DB         : “Read/Write data”
+  API --> ThirdParty : “Optional integrations”
+```
+
+### 2. Container Diagram  
+```mermaid
+graph LR
+  %% Frontend container
+  subgraph Frontend
+    UI[Zervi UI<br/>(HTML/CSS/JS)]
+    UI --> DASH[Dashboard Module]
+    UI --> BOM[BOM Management]
+    UI --> INV[Inventory Viewer]
+    UI --> MFG[Manufacturing Orders]
+    UI --> OPS[Operations]
+    UI --> TRANS[Transfers]
+  end
+
+  %% Backend container
+  subgraph Backend
+    API[Express API<br/>(TypeScript)]
+    API --> CFG[Config Loader]
+    API --> MWC[Middleware]
+    API --> ROUTES[Route Definitions]
+    ROUTES --> CTLS[Controllers]
+    CTLS --> MOD[Models / ORM]
+  end
+
+  DB[(Postgres Database)]
+  User((End User))
+
+  User --> UI
+  UI --> API
+  API --> DB
+```
+
+### 3. Component Diagram – Backend  
+```mermaid
+graph LR
+  subgraph Backend API (Node/Express TS)
+    CFG[Config Loader<br/>(src/config)]
+    MWC[Middleware<br/>(src/middleware)]
+    RT[Routes<br/>(src/routes)]
+    CT[Controllers<br/>(src/controllers)]
+    MD[Models / ORM<br/>(src/models)]
+  end
+
+  RT --> CT      : delegates requests
+  CT --> MD      : CRUD operations
+  CT --> CFG     : read settings
+  RT --> MWC     : auth, logging
+  CT --> ThirdParty[(3rd-party integr.)]
+```
+
+### 4. Component Diagram – Frontend  
+```mermaid
+graph TB
+  subgraph Zervi UI (Static HTML/JS)
+    DASH[Dashboard<br/>(overview widgets)]
+    BOMM[BOM Management<br/>(create/update BOM)]
+    INV[Inventory Viewer<br/>(list/search parts)]
+    MFG[Manufacturing Orders<br/>(list/detail)]
+    OPS[Operations<br/>(work centers)]
+    TRANS[Transfers<br/>(stock moves)]
+    DIV[Divisions<br/>(organizational units)]
+  end
+
+  User((End User)) -->|interacts| DASH
+  User --> BOMM
+  User --> INV
+  User --> MFG
+  User --> OPS
+  User --> TRANS
+  User --> DIV
+  eachModule -- API calls --> API[(Backend API)]
+```
+
 ## Implementation Phases
 
 The implementation is organized into six sequential phases, each with specific goals, tasks, and deliverables:

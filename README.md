@@ -23,18 +23,12 @@ This project is a comprehensive Manufacturing Resource Planning (MRP) applicatio
 
 ```shell
 ├── home/ubuntu/mrp-app/     # Original Application Code
-│   ├── backend/             # Node.js/Express Backend
-│   ├── frontend/            # React.js Frontend
-│   └── database/            # Database Scripts and Migrations
-├── zervi-ui-preview/        # Static UI Previews
-│   ├── dashboard/           # Dashboard UI
-│   ├── divisions/           # Divisions Overview UI
-│   ├── inventory/           # Inventory Management UI
-│   ├── manufacturing/       # Manufacturing Operations UI
-│   └── transfers/           # Inter-Division Transfers UI
-├── documentation/           # Project Documentation
-│   └── design/              # Design Documents
-└── *.md                     # Documentation Files
+├── src/
+│   ├── backend/             # Minimal Backend API (Node/Express TS)
+│   └── frontend/            # Static UI Preview (HTML/JS)
+├── database/                # Database Scripts and Migrations
+├── manus_package/           # Manus deliverables and guides
+└── *.md                     # Top-level documentation
 ```
 
 ## Documentation
@@ -49,17 +43,17 @@ This project is a comprehensive Manufacturing Resource Planning (MRP) applicatio
 
 ## UI Preview
 
-The `zervi-ui-preview` directory contains static HTML pages that showcase the UI design without requiring the full application stack. These pages provide a visual representation of the interface and can be viewed directly in any web browser.
+The `src/frontend` directory contains static HTML pages that showcase the UI design without requiring the full application stack. These pages provide a visual representation of the interface and can be viewed directly in any web browser.
 
 ## Getting Started
 
 1. Clone this repository
-2. Navigate to the backend directory: `cd home/ubuntu/mrp-app/backend`
-3. Install dependencies: `npm install`
-4. Start the backend server: `npm start`
-5. In a new terminal, navigate to the frontend directory: `cd home/ubuntu/mrp-app/frontend`
-6. Install dependencies: `npm install`
-7. Start the frontend development server: `npm start`
+2. Backend:
+   - cd src/backend
+   - npm install
+   - npm start
+3. Frontend:
+   - Open src/frontend/index.html in a browser
 
 ## License
 
