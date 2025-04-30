@@ -3,6 +3,7 @@ import { DivisionController } from "../controllers/division.controller";
 import { AuthController } from "../controllers/auth.controller";
 import { authMiddleware } from "../middleware/auth.middleware";
 import specializedOperationRoutes from "./specialized-operation.routes";
+import inventoryRoutes from "./inventory.routes";
 
 const router = Router();
 
@@ -29,6 +30,9 @@ router.post("/auth/refresh-token", (req: Request, res: Response, next: NextFunct
 
 // Specialized Operations routes
 router.use("/specialized-operations", specializedOperationRoutes);
+
+// Inventory Management routes
+router.use("/inventory", inventoryRoutes);
 
 // Division routes
 router.get("/divisions", (req: Request, res: Response, next: NextFunction) => {

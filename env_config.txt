@@ -1,0 +1,10 @@
+# Current backend environment configuration
+# (for reference only - not tracked in Git)
+
+DB_HOST=zervi-postgresql-u34072.vm.elestio.app
+DB_PORT=25432
+DB_USERNAME=postgres
+DB_PASSWORD=HcbzewvA-ObJp-BZhXVYmE
+DB_DATABASE=zervi_mrp
+
+# Copy these settings to your .env file in src/backend/

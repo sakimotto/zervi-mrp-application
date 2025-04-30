@@ -127,4 +127,95 @@
 
 ---
 
+## Schema Alignment for Inventory Management (April 30, 2025)
+
+### Summary
+- Conducted comprehensive analysis across all branches to locate database schema components
+- Found a well-designed and comprehensive SQL schema in `database/scripts/` on the main branch
+- Identified gaps between existing schema and frontend inventory management requirements
+- Created a detailed implementation plan to align backend schema with frontend features
+- Established development priorities for the inventory management module
+
+### Key Findings
+1. **Existing Schema Assets:**
+   - Discovered comprehensive database schema scripts in the main branch
+   - Found `lot_tracking` table that partially supports batch management
+   - Identified inventory, warehouses, and storage location tables in `02_inventory_tables.sql`
+
+2. **Frontend Requirements:**
+   - BatchManagementPage.js includes specialized features for fabric roll management
+   - UI supports batch splitting, serial number tracking, and detailed inventory records
+   - Mock data structures provide clear templates for required schema entities
+
+3. **Schema-Frontend Gap Analysis:**
+   - Need additional tables for serial number tracking
+   - Need specialized tables for fabric roll tracking with splitting capability
+   - Need to extend lot_tracking with additional attributes for batch management
+
+### Implementation Plan
+
+#### Phase 1: Schema Alignment
+1. **Create TypeORM Entity Models** corresponding to:
+   - Item categories and items
+   - Lot tracking and inventory
+   - Serial numbers for serialized inventory
+   - Fabric rolls with specialized attributes
+   - Parent-child relationships for split batches
+
+2. **Schema Additions Required:**
+   ```sql
+   -- Serial Number Tracking
+   CREATE TABLE serial_numbers (
+       id SERIAL PRIMARY KEY,
+       serial_number VARCHAR(100) NOT NULL,
+       item_id INTEGER REFERENCES items(id) NOT NULL,
+       lot_id INTEGER REFERENCES lot_tracking(id),
+       status VARCHAR(50) DEFAULT 'available',
+       created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+       updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+   );
+
+   -- Fabric Roll Tracking (for specialized split functionality)
+   CREATE TABLE fabric_rolls (
+       id SERIAL PRIMARY KEY,
+       lot_id INTEGER REFERENCES lot_tracking(id) NOT NULL,
+       serial_number_id INTEGER REFERENCES serial_numbers(id),
+       quantity DECIMAL(10, 2) NOT NULL,
+       width DECIMAL(10, 2),
+       notes TEXT,
+       parent_roll_id INTEGER REFERENCES fabric_rolls(id),
+       created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+       updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+   );
+   ```
+
+#### Phase 2: Backend API Development
+1. Create RESTful endpoints for:
+   - Inventory item management
+   - Batch/lot tracking operations
+   - Serial number generation and management
+   - Specialized fabric roll operations (including splitting)
+
+2. Implement business logic for:
+   - Inventory quantity tracking across batches
+   - Validation for batch splitting operations
+   - Historical transaction logging
+
+#### Phase 3: Frontend Integration
+1. Replace mock data providers with real API service calls
+2. Implement proper error handling and loading states
+3. Enhance UI for specialized batch operations
+
+### Next Steps
+1. Create TypeORM entity models for required tables
+2. Generate migration scripts for schema additions
+3. Implement backend API endpoints for batch management
+4. Update frontend to connect with the new API endpoints
+
+### Timeline
+- **Phase 1 (Schema Alignment)**: Target completion - May 3, 2025
+- **Phase 2 (Backend API)**: Target completion - May 7, 2025  
+- **Phase 3 (Frontend Integration)**: Target completion - May 10, 2025
+
+---
 _Last updated: April 30, 2025 by Cascade Coding Agent_

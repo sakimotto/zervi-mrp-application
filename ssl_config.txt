@@ -1,0 +1,7 @@
+# SSL Configuration for TypeORM
+
+// Add these parameters to the TypeORM connection configuration in database.ts:
+
+ssl: {
+  rejectUnauthorized: false
+},

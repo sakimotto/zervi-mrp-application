@@ -1,5 +1,19 @@
 import { DataSource } from "typeorm";
 import * as dotenv from "dotenv";
+import { Company } from "../models/company.model";
+import { Division } from "../models/division.model";
+import { User } from "../models/user.model";
+import { 
+  ItemCategory, 
+  UnitOfMeasurement, 
+  Item, 
+  Warehouse, 
+  StorageLocation,
+  LotTracking,
+  Inventory,
+  SerialNumber,
+  FabricRoll
+} from "../models/inventory";
 
 // Load environment variables from .env file
 dotenv.config();
@@ -14,9 +28,25 @@ export const AppDataSource = new DataSource({
   database: process.env.DB_DATABASE || "zervi_mrp",
   synchronize: false, // Set to false in production to avoid accidental schema changes
   logging: process.env.NODE_ENV === "development",
-  entities: [__dirname + "/../models/**/*.{js,ts}"],
+  entities: [
+    Company,
+    Division,
+    User,
+    ItemCategory,
+    UnitOfMeasurement,
+    Item,
+    Warehouse,
+    StorageLocation,
+    LotTracking,
+    Inventory,
+    SerialNumber,
+    FabricRoll
+  ],
   subscribers: [],
-  migrations: [],
+  migrations: [__dirname + "/../migrations/**/*.{js,ts}"],
+  ssl: {
+    rejectUnauthorized: false // Allow self-signed certificates for Elestio PostgreSQL
+  },
 });
 
 // Function to initialize the database connection
