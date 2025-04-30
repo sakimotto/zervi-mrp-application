@@ -24,7 +24,7 @@ export const AppDataSource = new DataSource({
   host: process.env.DB_HOST || "localhost",
   port: parseInt(process.env.DB_PORT || "5432"),
   username: process.env.DB_USERNAME || "postgres",
-  password: process.env.DB_PASSWORD || "postgres", 
+  password: process.env.DB_PASSWORD || "postgres",
   database: process.env.DB_DATABASE || "zervi_mrp",
   synchronize: false, // Set to false in production to avoid accidental schema changes
   logging: process.env.NODE_ENV === "development",
@@ -44,20 +44,15 @@ export const AppDataSource = new DataSource({
   ],
   subscribers: [],
   migrations: [__dirname + "/../migrations/**/*.{js,ts}"],
-  // SSL disabled for local development - comment out for production
+  // Comment out SSL for local development
   // ssl: {
-  //   rejectUnauthorized: false
+  //   rejectUnauthorized: false // Allow self-signed certificates for Elestio PostgreSQL
   // },
 });
 
 // Function to initialize the database connection
 export const initializeDatabase = async () => {
   try {
-    console.log("Attempting to connect with these parameters:");
-    console.log(`Host: ${process.env.DB_HOST || "localhost"}`);
-    console.log(`Database: ${process.env.DB_DATABASE || "zervi_mrp"}`);
-    console.log(`Username: ${process.env.DB_USERNAME || "postgres"}`);
-    
     await AppDataSource.initialize();
     console.log("Database connection established successfully");
     return true;

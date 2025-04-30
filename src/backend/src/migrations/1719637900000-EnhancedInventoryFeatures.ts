@@ -8,13 +8,13 @@ import { MigrationInterface, QueryRunner } from "typeorm";
  * - Fabric roll management with split functionality
  * - Enhanced lot tracking capabilities
  */
-export class EnhancedInventoryFeatures1714452000000 implements MigrationInterface {
-    name = 'EnhancedInventoryFeatures1714452000000';
+export class EnhancedInventoryFeatures1719637900000 implements MigrationInterface {
+    name = 'EnhancedInventoryFeatures1719637900000';
 
     public async up(queryRunner: QueryRunner): Promise<void> {
         // Add specialized tracking columns to items table
         await queryRunner.query(`
-            ALTER TABLE items
+            ALTER TABLE item
             ADD COLUMN IF NOT EXISTS track_batches BOOLEAN DEFAULT FALSE,
             ADD COLUMN IF NOT EXISTS track_serials BOOLEAN DEFAULT FALSE,
             ADD COLUMN IF NOT EXISTS allow_split BOOLEAN DEFAULT FALSE;
@@ -36,7 +36,7 @@ export class EnhancedInventoryFeatures1714452000000 implements MigrationInterfac
             CREATE TABLE IF NOT EXISTS serial_numbers (
                 id SERIAL PRIMARY KEY,
                 serial_number VARCHAR(100) NOT NULL,
-                item_id INTEGER REFERENCES items(id) NOT NULL,
+                item_id INTEGER REFERENCES item(id) NOT NULL,
                 lot_id INTEGER REFERENCES lot_tracking(id),
                 status VARCHAR(50) DEFAULT 'available',
                 location VARCHAR(255),
@@ -100,7 +100,7 @@ export class EnhancedInventoryFeatures1714452000000 implements MigrationInterfac
 
         // Remove columns from existing tables
         await queryRunner.query(`
-            ALTER TABLE items
+            ALTER TABLE item
             DROP COLUMN IF EXISTS track_batches,
             DROP COLUMN IF EXISTS track_serials,
             DROP COLUMN IF EXISTS allow_split;
