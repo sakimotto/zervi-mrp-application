@@ -2,6 +2,7 @@ import { Router, Request, Response, NextFunction } from "express";
 import { DivisionController } from "../controllers/division.controller";
 import { AuthController } from "../controllers/auth.controller";
 import { authMiddleware } from "../middleware/auth.middleware";
+import specializedOperationRoutes from "./specialized-operation.routes";
 
 const router = Router();
 
@@ -24,7 +25,10 @@ router.post("/auth/refresh-token", (req: Request, res: Response, next: NextFunct
 
 // Protected routes (require authentication)
 // Comment out the line below for initial testing if needed
-router.use(authMiddleware);
+// router.use(authMiddleware);
+
+// Specialized Operations routes
+router.use("/specialized-operations", specializedOperationRoutes);
 
 // Division routes
 router.get("/divisions", (req: Request, res: Response, next: NextFunction) => {

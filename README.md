@@ -7,6 +7,7 @@ This project is a comprehensive Manufacturing Resource Planning (MRP) applicatio
 ## Key Features
 
 - **Multi-Division Support**: Dedicated dashboards for all four divisions with division-specific workflows and KPIs
+- **Advanced Inventory Management**: Complete inventory tracking with batch/lot numbers, serial tracking, barcode support, and specialized fabric roll management
 - **Multi-level BOM Management**: Hierarchical product structures with raw materials, semi-finished goods, and finished products
 - **Specialized Manufacturing Operations**: Tracking for Laminating, Cutting, Sewing, and Embroidery operations
 - **Inter-Division Transfer System**: Seamless material flow between divisions supporting vertical integration

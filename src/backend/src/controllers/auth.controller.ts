@@ -51,9 +51,15 @@ export class AuthController {
         expiresIn: 86400 // 24 hours in seconds
       });
     } catch (error) {
-      console.error("Error in login:", error);
+      // Enhanced error logging for debugging
+      console.error("[LOGIN ERROR]", error);
+      if (error instanceof Error) {
+        console.error("[LOGIN ERROR STACK]", error.stack);
+      }
       return res.status(500).json({
-        message: "Error processing login request"
+        message: "Error processing login request",
+        error: process.env.NODE_ENV === 'development' ? (error instanceof Error ? error.message : String(error)) : undefined,
+        stack: process.env.NODE_ENV === 'development' && error instanceof Error ? error.stack : undefined
       });
     }
   }
