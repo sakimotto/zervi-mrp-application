@@ -1,11 +1,12 @@
-import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, ManyToOne, OneToMany, JoinColumn } from "typeorm";
+import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, ManyToOne, OneToMany, JoinColumn, ManyToMany } from "typeorm";
 import { Division } from "../division.model";
 import { ItemCategory } from "./item-category.model";
 import { UnitOfMeasurement } from "./unit-of-measurement.model";
+import { ItemTag } from "./item-tag.model";
 
 /**
  * Item Entity
- * 
+ *
  * Represents inventory items in the Zervi MRP system.
  * This includes raw materials, finished goods, and semi-finished goods.
  */
@@ -60,6 +61,29 @@ export class Item {
   @Column({ name: "allow_split", default: false })
   allowSplit: boolean;
 
+  // Reorder point management fields
+  @Column({ name: "reorder_point", type: "decimal", precision: 10, scale: 2, default: 0 })
+  reorderPoint: number;
+
+  @Column({ name: "reorder_quantity", type: "decimal", precision: 10, scale: 2, default: 0 })
+  reorderQuantity: number;
+
+  @Column({ name: "critical_threshold", type: "decimal", precision: 10, scale: 2, default: 0 })
+  criticalThreshold: number;
+
+  @Column({ name: "auto_reorder", default: false })
+  autoReorder: boolean;
+
+  // Barcode/QR code support
+  @Column({ length: 100, nullable: true })
+  barcode: string;
+
+  @Column({ name: "barcode_type", length: 50, nullable: true })
+  barcodeType: string;
+
+  @Column({ name: "qr_code_data", type: "text", nullable: true })
+  qrCodeData: string;
+
   @ManyToOne(() => Division)
   @JoinColumn({ name: "division_id" })
   division: Division;
@@ -76,6 +100,18 @@ export class Item {
 
   @OneToMany("SerialNumber", "item")
   serialNumbers: any[];
+
+  @OneToMany("InventoryTransaction", "item")
+  transactions: any[];
+
+  @OneToMany("ItemAttribute", "item")
+  attributes: any[];
+
+  @OneToMany("InventoryAlert", "item")
+  alerts: any[];
+
+  @ManyToMany(() => ItemTag, tag => tag.items)
+  tags: ItemTag[];
 
   @CreateDateColumn({ name: "created_at" })
   createdAt: Date;

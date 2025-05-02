@@ -21,7 +21,15 @@ import {
   InputLabel,
   Select,
   MenuItem,
-  Grid
+  Grid,
+  Card,
+  CardContent,
+  LinearProgress,
+  Tabs,
+  Tab,
+  Badge,
+  Divider,
+  Stack
 } from '@mui/material';
 import {
   Add as AddIcon,
@@ -30,7 +38,13 @@ import {
   Refresh as RefreshIcon,
   Search as SearchIcon,
   Visibility as ViewIcon,
-  FilterList as FilterIcon
+  FilterList as FilterIcon,
+  CalendarMonth as CalendarIcon,
+  ViewList as ListView,
+  Dashboard as DashboardIcon,
+  DateRange as DateRangeIcon,
+  Person as PersonIcon,
+  Sort as SortIcon
 } from '@mui/icons-material';
 import { manufacturingOrderAPI } from '../../services/api';
 
@@ -44,7 +58,12 @@ export default function ManufacturingOrdersPage() {
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [statusFilter, setStatusFilter] = useState('all');
   const [priorityFilter, setPriorityFilter] = useState('all');
+  const [assigneeFilter, setAssigneeFilter] = useState('all');
+  const [dateRangeFilter, setDateRangeFilter] = useState('all');
+  const [sortBy, setSortBy] = useState('dueDate');
+  const [sortDirection, setSortDirection] = useState('asc');
   const [showFilters, setShowFilters] = useState(false);
+  const [viewMode, setViewMode] = useState('table'); // 'table', 'cards', 'dashboard'
 
   // Mock data for now - will be replaced with API call
   useEffect(() => {
@@ -219,7 +238,7 @@ export default function ManufacturingOrdersPage() {
     // fetchOrders();
   }, []);
 
-  // Apply filters and search
+  // Apply filters, search, and sorting
   useEffect(() => {
     let result = [...orders];
     
@@ -233,19 +252,73 @@ export default function ManufacturingOrdersPage() {
       result = result.filter(order => order.priority === priorityFilter);
     }
     
+    // Apply assignee filter
+    if (assigneeFilter !== 'all') {
+      result = result.filter(order => order.assignedTo === assigneeFilter);
+    }
+    
+    // Apply date range filter
+    if (dateRangeFilter !== 'all') {
+      const today = new Date();
+      const todayStr = today.toISOString().split('T')[0];
+      
+      switch (dateRangeFilter) {
+        case 'overdue':
+          result = result.filter(order => order.dueDate < todayStr && order.status !== 'Completed');
+          break;
+        case 'today':
+          result = result.filter(order => order.dueDate === todayStr);
+          break;
+        case 'thisWeek':
+          const nextWeek = new Date(today);
+          nextWeek.setDate(today.getDate() + 7);
+          const nextWeekStr = nextWeek.toISOString().split('T')[0];
+          result = result.filter(order => order.dueDate >= todayStr && order.dueDate <= nextWeekStr);
+          break;
+        case 'thisMonth':
+          const nextMonth = new Date(today);
+          nextMonth.setMonth(today.getMonth() + 1);
+          const nextMonthStr = nextMonth.toISOString().split('T')[0];
+          result = result.filter(order => order.dueDate >= todayStr && order.dueDate <= nextMonthStr);
+          break;
+      }
+    }
+    
     // Apply search term
     if (searchTerm.trim() !== '') {
       result = result.filter(
-        order => 
+        order =>
           order.orderNumber.toLowerCase().includes(searchTerm.toLowerCase()) ||
           order.productName.toLowerCase().includes(searchTerm.toLowerCase()) ||
           order.assignedTo.toLowerCase().includes(searchTerm.toLowerCase())
       );
     }
     
+    // Apply sorting
+    result.sort((a, b) => {
+      let aValue = a[sortBy];
+      let bValue = b[sortBy];
+      
+      // Handle date comparisons
+      if (sortBy === 'dueDate' || sortBy === 'startDate') {
+        aValue = new Date(aValue);
+        bValue = new Date(bValue);
+      }
+      
+      // Handle numeric comparisons
+      if (sortBy === 'quantity' || sortBy === 'completedQuantity') {
+        aValue = Number(aValue);
+        bValue = Number(bValue);
+      }
+      
+      if (aValue < bValue) return sortDirection === 'asc' ? -1 : 1;
+      if (aValue > bValue) return sortDirection === 'asc' ? 1 : -1;
+      return 0;
+    });
+    
     setFilteredOrders(result);
     setPage(0); // Reset to first page when filters change
-  }, [searchTerm, statusFilter, priorityFilter, orders]);
+  }, [searchTerm, statusFilter, priorityFilter, assigneeFilter, dateRangeFilter, sortBy, sortDirection, orders]);
 
   const handleSearchChange = (event) => {
     setSearchTerm(event.target.value);
@@ -257,6 +330,29 @@ export default function ManufacturingOrdersPage() {
 
   const handlePriorityFilterChange = (event) => {
     setPriorityFilter(event.target.value);
+  };
+  
+  const handleAssigneeFilterChange = (event) => {
+    setAssigneeFilter(event.target.value);
+  };
+  
+  const handleDateRangeFilterChange = (event) => {
+    setDateRangeFilter(event.target.value);
+  };
+  
+  const handleSortChange = (field) => {
+    if (sortBy === field) {
+      // Toggle direction if clicking the same field
+      setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc');
+    } else {
+      // Set new field and default to ascending
+      setSortBy(field);
+      setSortDirection('asc');
+    }
+  };
+  
+  const handleViewModeChange = (event, newValue) => {
+    setViewMode(newValue);
   };
 
   const handleChangePage = (event, newPage) => {
@@ -348,6 +444,58 @@ export default function ManufacturingOrdersPage() {
   const calculateProgress = (completed, total) => {
     return (completed / total) * 100;
   };
+  
+  // Get unique assignees for filter dropdown
+  const getUniqueAssignees = () => {
+    const assignees = orders.map(order => order.assignedTo);
+    return [...new Set(assignees)];
+  };
+  
+  // Count orders by status for dashboard view
+  const getOrderCountsByStatus = () => {
+    const counts = {
+      Planned: 0,
+      'In Progress': 0,
+      'On Hold': 0,
+      Completed: 0,
+      Cancelled: 0
+    };
+    
+    orders.forEach(order => {
+      if (counts[order.status] !== undefined) {
+        counts[order.status]++;
+      }
+    });
+    
+    return counts;
+  };
+  
+  // Count orders by priority for dashboard view
+  const getOrderCountsByPriority = () => {
+    const counts = {
+      High: 0,
+      Medium: 0,
+      Low: 0
+    };
+    
+    orders.forEach(order => {
+      if (counts[order.priority] !== undefined) {
+        counts[order.priority]++;
+      }
+    });
+    
+    return counts;
+  };
+  
+  // Get overdue orders count
+  const getOverdueOrdersCount = () => {
+    const today = new Date().toISOString().split('T')[0];
+    return orders.filter(order =>
+      order.dueDate < today &&
+      order.status !== 'Completed' &&
+      order.status !== 'Cancelled'
+    ).length;
+  };
 
   return (
     <Box sx={{ p: 3 }}>
@@ -355,13 +503,39 @@ export default function ManufacturingOrdersPage() {
         <Typography variant="h5" component="h1">
           Manufacturing Orders
         </Typography>
-        <Button 
-          variant="contained" 
-          startIcon={<AddIcon />}
-          onClick={handleAddOrder}
-        >
-          Create New Order
-        </Button>
+        <Box>
+          <Tabs
+            value={viewMode}
+            onChange={handleViewModeChange}
+            sx={{ mr: 2, display: 'inline-flex' }}
+          >
+            <Tab
+              icon={<ListView />}
+              value="table"
+              label="List"
+              iconPosition="start"
+            />
+            <Tab
+              icon={<DashboardIcon />}
+              value="dashboard"
+              label="Dashboard"
+              iconPosition="start"
+            />
+            <Tab
+              icon={<CalendarIcon />}
+              value="cards"
+              label="Cards"
+              iconPosition="start"
+            />
+          </Tabs>
+          <Button
+            variant="contained"
+            startIcon={<AddIcon />}
+            onClick={handleAddOrder}
+          >
+            Create New Order
+          </Button>
+        </Box>
       </Box>
       
       <Paper sx={{ mb: 3, p: 2 }}>
@@ -423,108 +597,452 @@ export default function ManufacturingOrdersPage() {
                 </Select>
               </FormControl>
             </Grid>
+            <Grid item xs={12} sm={6} md={3}>
+              <FormControl size="small" fullWidth>
+                <InputLabel>Assigned To</InputLabel>
+                <Select
+                  value={assigneeFilter}
+                  label="Assigned To"
+                  onChange={handleAssigneeFilterChange}
+                >
+                  <MenuItem value="all">All Assignees</MenuItem>
+                  {getUniqueAssignees().map(assignee => (
+                    <MenuItem key={assignee} value={assignee}>{assignee}</MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+            </Grid>
+            <Grid item xs={12} sm={6} md={3}>
+              <FormControl size="small" fullWidth>
+                <InputLabel>Date Range</InputLabel>
+                <Select
+                  value={dateRangeFilter}
+                  label="Date Range"
+                  onChange={handleDateRangeFilterChange}
+                >
+                  <MenuItem value="all">All Dates</MenuItem>
+                  <MenuItem value="overdue">
+                    <Badge badgeContent={getOverdueOrdersCount()} color="error" sx={{ '& .MuiBadge-badge': { right: -16 } }}>
+                      Overdue
+                    </Badge>
+                  </MenuItem>
+                  <MenuItem value="today">Due Today</MenuItem>
+                  <MenuItem value="thisWeek">Due This Week</MenuItem>
+                  <MenuItem value="thisMonth">Due This Month</MenuItem>
+                </Select>
+              </FormControl>
+            </Grid>
           </Grid>
         )}
         
-        <TableContainer>
-          <Table>
-            <TableHead>
-              <TableRow>
-                <TableCell>Order #</TableCell>
-                <TableCell>Product</TableCell>
-                <TableCell align="right">Quantity</TableCell>
-                <TableCell>Priority</TableCell>
-                <TableCell>Status</TableCell>
-                <TableCell>Progress</TableCell>
-                <TableCell>Start Date</TableCell>
-                <TableCell>Due Date</TableCell>
-                <TableCell>Assigned To</TableCell>
-                <TableCell align="center">Actions</TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
+        {/* Table View */}
+        {viewMode === 'table' && (
+          <>
+            <TableContainer>
+              <Table>
+                <TableHead>
+                  <TableRow>
+                    <TableCell>
+                      <Box sx={{ display: 'flex', alignItems: 'center', cursor: 'pointer' }} onClick={() => handleSortChange('orderNumber')}>
+                        Order #
+                        {sortBy === 'orderNumber' && (
+                          <SortIcon fontSize="small" sx={{ ml: 0.5, transform: sortDirection === 'desc' ? 'rotate(180deg)' : 'none' }} />
+                        )}
+                      </Box>
+                    </TableCell>
+                    <TableCell>
+                      <Box sx={{ display: 'flex', alignItems: 'center', cursor: 'pointer' }} onClick={() => handleSortChange('productName')}>
+                        Product
+                        {sortBy === 'productName' && (
+                          <SortIcon fontSize="small" sx={{ ml: 0.5, transform: sortDirection === 'desc' ? 'rotate(180deg)' : 'none' }} />
+                        )}
+                      </Box>
+                    </TableCell>
+                    <TableCell align="right">
+                      <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', cursor: 'pointer' }} onClick={() => handleSortChange('quantity')}>
+                        Quantity
+                        {sortBy === 'quantity' && (
+                          <SortIcon fontSize="small" sx={{ ml: 0.5, transform: sortDirection === 'desc' ? 'rotate(180deg)' : 'none' }} />
+                        )}
+                      </Box>
+                    </TableCell>
+                    <TableCell>
+                      <Box sx={{ display: 'flex', alignItems: 'center', cursor: 'pointer' }} onClick={() => handleSortChange('priority')}>
+                        Priority
+                        {sortBy === 'priority' && (
+                          <SortIcon fontSize="small" sx={{ ml: 0.5, transform: sortDirection === 'desc' ? 'rotate(180deg)' : 'none' }} />
+                        )}
+                      </Box>
+                    </TableCell>
+                    <TableCell>
+                      <Box sx={{ display: 'flex', alignItems: 'center', cursor: 'pointer' }} onClick={() => handleSortChange('status')}>
+                        Status
+                        {sortBy === 'status' && (
+                          <SortIcon fontSize="small" sx={{ ml: 0.5, transform: sortDirection === 'desc' ? 'rotate(180deg)' : 'none' }} />
+                        )}
+                      </Box>
+                    </TableCell>
+                    <TableCell>Progress</TableCell>
+                    <TableCell>
+                      <Box sx={{ display: 'flex', alignItems: 'center', cursor: 'pointer' }} onClick={() => handleSortChange('startDate')}>
+                        Start Date
+                        {sortBy === 'startDate' && (
+                          <SortIcon fontSize="small" sx={{ ml: 0.5, transform: sortDirection === 'desc' ? 'rotate(180deg)' : 'none' }} />
+                        )}
+                      </Box>
+                    </TableCell>
+                    <TableCell>
+                      <Box sx={{ display: 'flex', alignItems: 'center', cursor: 'pointer' }} onClick={() => handleSortChange('dueDate')}>
+                        Due Date
+                        {sortBy === 'dueDate' && (
+                          <SortIcon fontSize="small" sx={{ ml: 0.5, transform: sortDirection === 'desc' ? 'rotate(180deg)' : 'none' }} />
+                        )}
+                      </Box>
+                    </TableCell>
+                    <TableCell>
+                      <Box sx={{ display: 'flex', alignItems: 'center', cursor: 'pointer' }} onClick={() => handleSortChange('assignedTo')}>
+                        Assigned To
+                        {sortBy === 'assignedTo' && (
+                          <SortIcon fontSize="small" sx={{ ml: 0.5, transform: sortDirection === 'desc' ? 'rotate(180deg)' : 'none' }} />
+                        )}
+                      </Box>
+                    </TableCell>
+                    <TableCell align="center">Actions</TableCell>
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {filteredOrders
+                    .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+                    .map((order) => (
+                      <TableRow key={order.id} hover onClick={() => handleViewOrder(order.id)} sx={{ cursor: 'pointer' }}>
+                        <TableCell>{order.orderNumber}</TableCell>
+                        <TableCell>{order.productName}</TableCell>
+                        <TableCell align="right">{order.quantity}</TableCell>
+                        <TableCell>
+                          <Chip
+                            label={order.priority}
+                            color={getPriorityColor(order.priority)}
+                            size="small"
+                          />
+                        </TableCell>
+                        <TableCell>
+                          <Chip
+                            label={order.status}
+                            color={getStatusColor(order.status)}
+                            size="small"
+                          />
+                        </TableCell>
+                        <TableCell>
+                          <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                            <Box sx={{ width: '100%', mr: 1 }}>
+                              <LinearProgress
+                                variant="determinate"
+                                value={calculateProgress(order.completedQuantity, order.quantity)}
+                                color={getStatusColor(order.status)}
+                                sx={{ height: 8, borderRadius: 1 }}
+                              />
+                            </Box>
+                            <Box sx={{ minWidth: 35 }}>
+                              <Typography variant="body2" color="text.secondary">
+                                {calculateProgress(order.completedQuantity, order.quantity).toFixed(0)}%
+                              </Typography>
+                            </Box>
+                          </Box>
+                        </TableCell>
+                        <TableCell>{order.startDate}</TableCell>
+                        <TableCell>{order.dueDate}</TableCell>
+                        <TableCell>{order.assignedTo}</TableCell>
+                        <TableCell align="center">
+                          <Box sx={{ display: 'flex', justifyContent: 'center' }}>
+                            <Tooltip title="View Details">
+                              <IconButton
+                                size="small"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  handleViewOrder(order.id);
+                                }}
+                              >
+                                <ViewIcon fontSize="small" />
+                              </IconButton>
+                            </Tooltip>
+                            <Tooltip title="Edit">
+                              <IconButton
+                                size="small"
+                                onClick={(e) => handleEditOrder(order.id, e)}
+                              >
+                                <EditIcon fontSize="small" />
+                              </IconButton>
+                            </Tooltip>
+                            <Tooltip title="Delete">
+                              <IconButton
+                                size="small"
+                                color="error"
+                                onClick={(e) => handleDeleteOrder(order.id, e)}
+                              >
+                                <DeleteIcon fontSize="small" />
+                              </IconButton>
+                            </Tooltip>
+                          </Box>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  {filteredOrders.length === 0 && (
+                    <TableRow>
+                      <TableCell colSpan={10} align="center">
+                        {loading ? 'Loading orders...' : 'No manufacturing orders found'}
+                      </TableCell>
+                    </TableRow>
+                  )}
+                </TableBody>
+              </Table>
+            </TableContainer>
+            
+            <TablePagination
+              component="div"
+              count={filteredOrders.length}
+              page={page}
+              onPageChange={handleChangePage}
+              rowsPerPage={rowsPerPage}
+              onRowsPerPageChange={handleChangeRowsPerPage}
+              rowsPerPageOptions={[5, 10, 25, 50]}
+            />
+          </>
+        )}
+        
+        {/* Dashboard View */}
+        {viewMode === 'dashboard' && (
+          <Box sx={{ mb: 3 }}>
+            <Grid container spacing={3}>
+              <Grid item xs={12} md={6}>
+                <Card>
+                  <CardContent>
+                    <Typography variant="h6" gutterBottom>Orders by Status</Typography>
+                    <Box sx={{ mt: 2 }}>
+                      {Object.entries(getOrderCountsByStatus()).map(([status, count]) => (
+                        <Box key={status} sx={{ mb: 1 }}>
+                          <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 0.5 }}>
+                            <Typography variant="body2">
+                              <Chip
+                                label={status}
+                                color={getStatusColor(status)}
+                                size="small"
+                                sx={{ mr: 1 }}
+                              />
+                              {status}
+                            </Typography>
+                            <Typography variant="body2">{count} orders</Typography>
+                          </Box>
+                          <LinearProgress
+                            variant="determinate"
+                            value={(count / orders.length) * 100}
+                            color={getStatusColor(status)}
+                            sx={{ height: 8, borderRadius: 1 }}
+                          />
+                        </Box>
+                      ))}
+                    </Box>
+                  </CardContent>
+                </Card>
+              </Grid>
+              
+              <Grid item xs={12} md={6}>
+                <Card>
+                  <CardContent>
+                    <Typography variant="h6" gutterBottom>Orders by Priority</Typography>
+                    <Box sx={{ mt: 2 }}>
+                      {Object.entries(getOrderCountsByPriority()).map(([priority, count]) => (
+                        <Box key={priority} sx={{ mb: 1 }}>
+                          <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 0.5 }}>
+                            <Typography variant="body2">
+                              <Chip
+                                label={priority}
+                                color={getPriorityColor(priority)}
+                                size="small"
+                                sx={{ mr: 1 }}
+                              />
+                              {priority}
+                            </Typography>
+                            <Typography variant="body2">{count} orders</Typography>
+                          </Box>
+                          <LinearProgress
+                            variant="determinate"
+                            value={(count / orders.length) * 100}
+                            color={getPriorityColor(priority)}
+                            sx={{ height: 8, borderRadius: 1 }}
+                          />
+                        </Box>
+                      ))}
+                    </Box>
+                  </CardContent>
+                </Card>
+              </Grid>
+              
+              <Grid item xs={12}>
+                <Card>
+                  <CardContent>
+                    <Typography variant="h6" gutterBottom>Recent Orders</Typography>
+                    <TableContainer>
+                      <Table size="small">
+                        <TableHead>
+                          <TableRow>
+                            <TableCell>Order #</TableCell>
+                            <TableCell>Product</TableCell>
+                            <TableCell>Status</TableCell>
+                            <TableCell>Due Date</TableCell>
+                            <TableCell align="center">Actions</TableCell>
+                          </TableRow>
+                        </TableHead>
+                        <TableBody>
+                          {filteredOrders.slice(0, 5).map((order) => (
+                            <TableRow key={order.id} hover onClick={() => handleViewOrder(order.id)} sx={{ cursor: 'pointer' }}>
+                              <TableCell>{order.orderNumber}</TableCell>
+                              <TableCell>{order.productName}</TableCell>
+                              <TableCell>
+                                <Chip
+                                  label={order.status}
+                                  color={getStatusColor(order.status)}
+                                  size="small"
+                                />
+                              </TableCell>
+                              <TableCell>{order.dueDate}</TableCell>
+                              <TableCell align="center">
+                                <Tooltip title="View Details">
+                                  <IconButton size="small" onClick={(e) => {
+                                    e.stopPropagation();
+                                    handleViewOrder(order.id);
+                                  }}>
+                                    <ViewIcon fontSize="small" />
+                                  </IconButton>
+                                </Tooltip>
+                              </TableCell>
+                            </TableRow>
+                          ))}
+                        </TableBody>
+                      </Table>
+                    </TableContainer>
+                  </CardContent>
+                </Card>
+              </Grid>
+            </Grid>
+          </Box>
+        )}
+        
+        {/* Card View */}
+        {viewMode === 'cards' && (
+          <>
+            <Grid container spacing={2}>
               {filteredOrders
                 .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
                 .map((order) => (
-                  <TableRow key={order.id} hover onClick={() => handleViewOrder(order.id)} sx={{ cursor: 'pointer' }}>
-                    <TableCell>{order.orderNumber}</TableCell>
-                    <TableCell>{order.productName}</TableCell>
-                    <TableCell align="right">{order.quantity}</TableCell>
-                    <TableCell>
-                      <Chip 
-                        label={order.priority} 
-                        color={getPriorityColor(order.priority)} 
-                        size="small" 
-                      />
-                    </TableCell>
-                    <TableCell>
-                      <Chip 
-                        label={order.status} 
-                        color={getStatusColor(order.status)} 
-                        size="small" 
-                      />
-                    </TableCell>
-                    <TableCell>
-                      {order.completedQuantity} of {order.quantity} 
-                      ({calculateProgress(order.completedQuantity, order.quantity).toFixed(0)}%)
-                    </TableCell>
-                    <TableCell>{order.startDate}</TableCell>
-                    <TableCell>{order.dueDate}</TableCell>
-                    <TableCell>{order.assignedTo}</TableCell>
-                    <TableCell align="center">
-                      <Box sx={{ display: 'flex', justifyContent: 'center' }}>
-                        <Tooltip title="View Details">
-                          <IconButton 
+                  <Grid item xs={12} sm={6} md={4} key={order.id}>
+                    <Card
+                      sx={{
+                        cursor: 'pointer',
+                        '&:hover': { boxShadow: 6 }
+                      }}
+                      onClick={() => handleViewOrder(order.id)}
+                    >
+                      <CardContent>
+                        <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
+                          <Typography variant="h6">{order.orderNumber}</Typography>
+                          <Chip
+                            label={order.status}
+                            color={getStatusColor(order.status)}
                             size="small"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              handleViewOrder(order.id);
-                            }}
-                          >
-                            <ViewIcon fontSize="small" />
-                          </IconButton>
-                        </Tooltip>
-                        <Tooltip title="Edit">
-                          <IconButton 
-                            size="small"
-                            onClick={(e) => handleEditOrder(order.id, e)}
-                          >
-                            <EditIcon fontSize="small" />
-                          </IconButton>
-                        </Tooltip>
-                        <Tooltip title="Delete">
-                          <IconButton 
-                            size="small" 
-                            color="error"
-                            onClick={(e) => handleDeleteOrder(order.id, e)}
-                          >
-                            <DeleteIcon fontSize="small" />
-                          </IconButton>
-                        </Tooltip>
-                      </Box>
-                    </TableCell>
-                  </TableRow>
+                          />
+                        </Box>
+                        
+                        <Typography variant="body2" color="text.secondary" gutterBottom>
+                          {order.productName}
+                        </Typography>
+                        
+                        <Divider sx={{ my: 1 }} />
+                        
+                        <Grid container spacing={1}>
+                          <Grid item xs={6}>
+                            <Typography variant="caption" color="text.secondary">
+                              Quantity
+                            </Typography>
+                            <Typography variant="body2">
+                              {order.completedQuantity} / {order.quantity}
+                            </Typography>
+                          </Grid>
+                          <Grid item xs={6}>
+                            <Typography variant="caption" color="text.secondary">
+                              Priority
+                            </Typography>
+                            <Box>
+                              <Chip
+                                label={order.priority}
+                                color={getPriorityColor(order.priority)}
+                                size="small"
+                              />
+                            </Box>
+                          </Grid>
+                          <Grid item xs={12} sx={{ mt: 1 }}>
+                            <Typography variant="caption" color="text.secondary">
+                              Progress
+                            </Typography>
+                            <LinearProgress
+                              variant="determinate"
+                              value={calculateProgress(order.completedQuantity, order.quantity)}
+                              sx={{ height: 6, borderRadius: 1, mt: 0.5 }}
+                            />
+                          </Grid>
+                          <Grid item xs={6} sx={{ mt: 1 }}>
+                            <Typography variant="caption" display="block" color="text.secondary">
+                              Due Date
+                            </Typography>
+                            <Typography variant="body2">
+                              {order.dueDate}
+                            </Typography>
+                          </Grid>
+                          <Grid item xs={6} sx={{ mt: 1 }}>
+                            <Typography variant="caption" display="block" color="text.secondary">
+                              Assigned To
+                            </Typography>
+                            <Typography variant="body2">
+                              {order.assignedTo}
+                            </Typography>
+                          </Grid>
+                        </Grid>
+                        
+                        <Box sx={{ display: 'flex', justifyContent: 'flex-end', mt: 1 }}>
+                          <Tooltip title="Edit">
+                            <IconButton
+                              size="small"
+                              onClick={(e) => handleEditOrder(order.id, e)}
+                            >
+                              <EditIcon fontSize="small" />
+                            </IconButton>
+                          </Tooltip>
+                          <Tooltip title="Delete">
+                            <IconButton
+                              size="small"
+                              color="error"
+                              onClick={(e) => handleDeleteOrder(order.id, e)}
+                            >
+                              <DeleteIcon fontSize="small" />
+                            </IconButton>
+                          </Tooltip>
+                        </Box>
+                      </CardContent>
+                    </Card>
+                  </Grid>
                 ))}
-              {filteredOrders.length === 0 && (
-                <TableRow>
-                  <TableCell colSpan={10} align="center">
-                    {loading ? 'Loading orders...' : 'No manufacturing orders found'}
-                  </TableCell>
-                </TableRow>
-              )}
-            </TableBody>
-          </Table>
-        </TableContainer>
-        
-        <TablePagination
-          component="div"
-          count={filteredOrders.length}
-          page={page}
-          onPageChange={handleChangePage}
-          rowsPerPage={rowsPerPage}
-          onRowsPerPageChange={handleChangeRowsPerPage}
-          rowsPerPageOptions={[5, 10, 25, 50]}
-        />
+            </Grid>
+            
+            <TablePagination
+              component="div"
+              count={filteredOrders.length}
+              page={page}
+              onPageChange={handleChangePage}
+              rowsPerPage={rowsPerPage}
+              onRowsPerPageChange={handleChangeRowsPerPage}
+              rowsPerPageOptions={[6, 12, 24]}
+            />
+          </>
+        )}
       </Paper>
     </Box>
   );

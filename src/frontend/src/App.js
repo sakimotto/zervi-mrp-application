@@ -21,6 +21,7 @@ import ZervitekDashboard from './pages/divisions/ZervitekDashboard';
 
 // Inventory management
 import InventoryDashboard from './pages/inventory/InventoryDashboard';
+import EnhancedInventoryDashboard from './pages/inventory/EnhancedInventoryDashboard';
 import InventoryListPage from './pages/inventory/InventoryListPage';
 import ItemDetailsPage from './pages/inventory/ItemDetailsPage';
 import ItemFormPage from './pages/inventory/ItemFormPage';
@@ -37,6 +38,7 @@ import ManufacturingOrderDetailsPage from './pages/manufacturing/ManufacturingOr
 import ProductionSchedulePage from './pages/manufacturing/ProductionSchedulePage';
 
 // Specialized Operations
+import OperationsDashboardPage from './pages/operations/OperationsDashboardPage';
 import LaminatingOperationsPage from './pages/operations/LaminatingOperationsPage';
 import CuttingOperationsPage from './pages/operations/CuttingOperationsPage';
 import SewingOperationsPage from './pages/operations/SewingOperationsPage';
@@ -114,13 +116,16 @@ function App() {
         <Route path="/divisions/zervitek" element={<ZervitekDashboard />} />
 
         {/* Inventory management */}
-        <Route path="/inventory" element={<InventoryDashboard />} />
+        <Route path="/inventory" element={<EnhancedInventoryDashboard />} />
+        <Route path="/inventory/classic" element={<InventoryDashboard />} />
         <Route path="/inventory/items" element={<InventoryListPage />} />
         <Route path="/inventory/items/new" element={<ItemFormPage />} />
         <Route path="/inventory/items/:id" element={<ItemDetailsPage />} />
         <Route path="/inventory/items/:id/edit" element={<ItemFormPage />} />
         <Route path="/inventory/items/:id/batches" element={<BatchManagementPage />} />
         <Route path="/inventory/warehouses" element={<WarehousesPage />} />
+        <Route path="/inventory/transactions" element={<EnhancedInventoryDashboard />} />
+        <Route path="/inventory/batches" element={<BatchManagementPage />} />
 
         {/* BOM management */}
         <Route path="/boms" element={<BomListPage />} />
@@ -132,6 +137,7 @@ function App() {
         <Route path="/manufacturing/schedule" element={<ProductionSchedulePage />} />
 
         {/* Specialized Operations */}
+        <Route path="/operations" element={<OperationsDashboardPage />} />
         <Route path="/operations/laminating" element={<LaminatingOperationsPage />} />
         <Route path="/operations/cutting" element={<CuttingOperationsPage />} />
         <Route path="/operations/sewing" element={<SewingOperationsPage />} />

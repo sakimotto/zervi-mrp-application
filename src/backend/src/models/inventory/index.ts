@@ -1,6 +1,6 @@
 /**
  * Inventory Models Index
- * 
+ *
  * This file exports all inventory-related entity models for easy importing
  * throughout the application.
  */
@@ -14,3 +14,9 @@ export { LotTracking } from './lot-tracking.model';
 export { Inventory } from './inventory.model';
 export { SerialNumber } from './serial-number.model';
 export { FabricRoll } from './fabric-roll.model';
+
+// New enhanced inventory models
+export { InventoryTransaction } from './inventory-transaction.model';
+export { ItemTag } from './item-tag.model';
+export { ItemAttribute } from './item-attribute.model';
+export { InventoryAlert } from './inventory-alert.model';
