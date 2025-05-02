@@ -12,7 +12,12 @@
     "lint": "eslint \"src/**/*.ts\"",
     "lint:fix": "eslint \"src/**/*.ts\" --fix",
     "format": "prettier --write \"src/**/*.ts\" \"*.json\" \"*.md\"",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "typeorm": "typeorm-ts-node-commonjs",
+    "migration:generate": "npm run typeorm -- migration:generate -d src/config/database.ts",
+    "migration:run": "npm run typeorm -- migration:run -d src/config/database.ts",
+    "migration:revert": "npm run typeorm -- migration:revert -d src/config/database.ts",
+    "schema:sync": "npm run typeorm -- schema:sync -d src/config/database.ts"
   },
   "keywords": [
     "mrp",
@@ -22,6 +27,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@mui/x-date-pickers": "^8.1.0",
     "@types/cors": "^2.8.17",
     "@types/express": "^5.0.1",
     "@types/node": "^22.13.14",
@@ -29,6 +35,10 @@
     "dotenv": "^16.4.7",
     "express": "^4.21.2",
     "pg": "^8.14.1",
+    "react-big-calendar": "^1.18.0",
+    "react-dnd": "^16.0.1",
+    "react-dnd-html5-backend": "^16.0.1",
+    "react-gantt-chart": "^0.3.0-rc.11",
     "reflect-metadata": "^0.2.2",
     "ts-node": "^10.9.2",
     "typeorm": "^0.3.21",
